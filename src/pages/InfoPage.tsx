@@ -192,66 +192,285 @@ function renderPageContent(slug: string) {
 
     case 'immersive-experiences':
       return (
-        <div className="max-w-[1440px] mx-auto px-6 lg:px-10 py-16 space-y-16">
-          <Link to="/" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary hover:underline">
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-10 py-16 space-y-24">
+          <Link to="/" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary hover:underline mb-4">
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
           </Link>
 
-          {/* Hero */}
-          <div className="space-y-4 max-w-3xl">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/5 text-primary text-xs font-bold uppercase tracking-widest">
-              Private Expeditions
-            </span>
-            <h1 className="font-headline font-extrabold text-4xl md:text-6xl text-[#1a1c1c] tracking-tight leading-[1.1]">
-              Bespoke Narratives: <br/>Journeys Beyond Stays.
-            </h1>
-            <p className="text-base text-[#5c3f41] leading-relaxed">
-              True luxury is not just where you rest; it is the collection of unique memories that define your travels. Explore experiences curated by local alchemists exclusively for LuxeStay residents.
-            </p>
-          </div>
+          {/* Hero Section */}
+          <section className="relative h-[65vh] min-h-[400px] flex items-center overflow-hidden rounded-2xl shadow-xl">
+            <div className="absolute inset-0 z-0">
+              <img 
+                alt="Gourmet dinner on a private terrace overlooking the Amalfi Coast" 
+                className="w-full h-full object-cover scale-105" 
+                src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1600"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent"></div>
+            </div>
+            <div className="relative z-10 w-full px-8 md:px-12">
+              <div className="max-w-xl space-y-6">
+                <span className="inline-block px-4 py-1 bg-primary text-white text-xs uppercase tracking-widest font-bold rounded-full">
+                  The Editorial Collection
+                </span>
+                <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter text-white leading-tight">
+                  Bespoke <br/>Narratives
+                </h1>
+                <p className="text-white/90 text-base md:text-lg font-light leading-relaxed">
+                  Luxury is more than a destination. It's the collection of unscripted moments that define your journey.
+                </p>
+              </div>
+            </div>
+          </section>
 
-          {/* Experiences Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="group space-y-4">
-              <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm relative">
-                <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1s]" src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600" alt="Cooking over coastal fires" />
-                <span className="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded-full text-[10px] font-bold text-[#1a1c1c] uppercase tracking-wider">Gastronomy</span>
-              </div>
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-headline font-bold text-lg text-[#1a1c1c] group-hover:text-primary transition-colors">Tuscan Truffle Hunt</h3>
-                  <p className="text-xs text-[#5c3f41] mt-1">4 Hours • Up to 4 Guests</p>
+          {/* Filter / Category Selector Bar */}
+          <section className="border-b border-outline-variant/10 pb-6 flex items-center justify-between">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">
+              {['All Discoveries', 'Gastronomy', 'Wellness', 'Adventure', 'Art & Culture'].map((cat, idx) => (
+                <button 
+                  key={cat} 
+                  className={`px-6 py-2 rounded-full text-xs font-semibold tracking-wide transition-all whitespace-nowrap ${
+                    idx === 0 ? 'bg-[#ba0036] text-white' : 'bg-surface-container hover:bg-surface-container-high text-[#5c3f41]'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* Experience Grid */}
+          <section className="space-y-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+              {/* Card 1 */}
+              <div className="group cursor-pointer space-y-6">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-md animate-reveal">
+                  <img 
+                    alt="Tuscan Truffle Hunting" 
+                    className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105" 
+                    src="https://images.unsplash.com/photo-1544025162-d76694265947?w=800"
+                  />
+                  <div className="absolute top-6 left-6 px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest text-[#1a1c1c] shadow-sm">
+                    Gastronomy
+                  </div>
                 </div>
-                <span className="font-headline font-bold text-sm text-primary">£450</span>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-headline text-2xl font-bold tracking-tight text-[#1a1c1c] group-hover:text-primary transition-colors">Tuscan Truffle Hunting</h3>
+                    <span className="text-primary font-bold text-lg">$450</span>
+                  </div>
+                  <p className="text-[#5c3f41] text-sm leading-relaxed line-clamp-2">
+                    Join a local expert and their seasoned lagotto romagnolo dogs through the private woods of San Miniato.
+                  </p>
+                  <div className="flex items-center gap-6 pt-2 text-[#5c3f41]">
+                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+                      <Clock className="w-4 h-4 text-primary" />
+                      <span>4 Hours</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+                      <UserCheck className="w-4 h-4 text-primary" />
+                      <span>4 Guests</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2 */}
+              <div className="group cursor-pointer space-y-6 lg:translate-y-6">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-md">
+                  <img 
+                    alt="Private Sunset Sail" 
+                    className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105" 
+                    src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800"
+                  />
+                  <div className="absolute top-6 left-6 px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest text-[#1a1c1c] shadow-sm">
+                    Adventure
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-headline text-2xl font-bold tracking-tight text-[#1a1c1c] group-hover:text-primary transition-colors">Private Sunset Sail</h3>
+                    <span className="text-primary font-bold text-lg">$1,200</span>
+                  </div>
+                  <p className="text-[#5c3f41] text-sm leading-relaxed line-clamp-2">
+                    Navigate the coastline on a bespoke 50ft yacht with vintage Bollinger and personal staff.
+                  </p>
+                  <div className="flex items-center gap-6 pt-2 text-[#5c3f41]">
+                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+                      <Clock className="w-4 h-4 text-primary" />
+                      <span>3 Hours</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+                      <Sparkles className="w-4 h-4 text-primary" />
+                      <span>VIP Privilege</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 3 */}
+              <div className="group cursor-pointer space-y-6">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-md">
+                  <img 
+                    alt="Midnight Gallery Tour" 
+                    className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105" 
+                    src="https://images.unsplash.com/photo-1531243269054-5ebf6f3b0b6e?w=800"
+                  />
+                  <div className="absolute top-6 left-6 px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest text-[#1a1c1c] shadow-sm">
+                    Art & Culture
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-headline text-2xl font-bold tracking-tight text-[#1a1c1c] group-hover:text-primary transition-colors">Midnight Gallery Tour</h3>
+                    <span className="text-primary font-bold text-lg">$600</span>
+                  </div>
+                  <p className="text-[#5c3f41] text-sm leading-relaxed line-clamp-2">
+                    A private, after-hours viewing of the city’s most exclusive contemporary art space.
+                  </p>
+                  <div className="flex items-center gap-6 pt-2 text-[#5c3f41]">
+                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+                      <Clock className="w-4 h-4 text-primary" />
+                      <span>2 Hours</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+                      <Sparkles className="w-4 h-4 text-primary" />
+                      <span>Curated Guide</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="group space-y-4">
-              <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm relative">
-                <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1s]" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" alt="Yacht sail sunset" />
-                <span className="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded-full text-[10px] font-bold text-[#1a1c1c] uppercase tracking-wider">Adventure</span>
-              </div>
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-headline font-bold text-lg text-[#1a1c1c] group-hover:text-primary transition-colors">Private Sunset Sail</h3>
-                  <p className="text-xs text-[#5c3f41] mt-1">3 Hours • Champagne Service</p>
+          </section>
+
+          {/* Feature Spotlight */}
+          <section className="py-16 overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              <div className="lg:col-span-7">
+                <div className="aspect-[16/10] rounded-2xl overflow-hidden shadow-xl">
+                  <img 
+                    alt="Blue horizon immersion" 
+                    className="w-full h-full object-cover" 
+                    src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1000"
+                  />
                 </div>
-                <span className="font-headline font-bold text-sm text-primary">£1,200</span>
+              </div>
+              <div className="lg:col-span-5 space-y-6">
+                <span className="text-xs font-bold uppercase tracking-widest text-primary">
+                  The Mediterranean Ethos
+                </span>
+                <h2 className="font-headline text-3xl md:text-4xl font-bold text-[#1a1c1c]">
+                  The Blue Horizon Immersion
+                </h2>
+                <p className="text-sm text-[#5c3f41] leading-relaxed">
+                  Experience the silent majesty of the Caldera. This isn't just a stay; it's a curated meditation on light, water, and timeless Cycladic architecture. Our hosts ensure total seclusion.
+                </p>
+                <button className="px-6 py-3 bg-[#ba0036] text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-md hover:bg-primary transition-colors">
+                  Reserve This Experience
+                </button>
               </div>
             </div>
-            <div className="group space-y-4">
-              <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm relative">
-                <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1s]" src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600" alt="Balinese ritual" />
-                <span className="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded-full text-[10px] font-bold text-[#1a1c1c] uppercase tracking-wider">Wellness</span>
-              </div>
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-headline font-bold text-lg text-[#1a1c1c] group-hover:text-primary transition-colors">Ubud Cleansing Ritual</h3>
-                  <p className="text-xs text-[#5c3f41] mt-1">5 Hours • Private Temple Tour</p>
+          </section>
+
+          {/* Concierge Moments */}
+          <section className="bg-surface-container-low p-8 md:p-12 rounded-2xl">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              <div className="lg:col-span-6 space-y-6">
+                <span className="text-xs font-bold uppercase tracking-widest text-secondary">
+                  Human Touch
+                </span>
+                <h2 className="font-headline text-3xl md:text-4xl font-bold text-[#1a1c1c]">
+                  Concierge Moments
+                </h2>
+                <p className="text-sm text-[#5c3f41] leading-relaxed">
+                  Our Concierge desk doesn't just book tickets; they craft legacies. Whether it's a surprise proposal in a hidden vineyard or a private flight to a remote island, your dedicated editorial host handles the alchemy of the extraordinary.
+                </p>
+                <div className="space-y-4 pt-2">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-sm text-[#1a1c1c]">Bespoke Curation</h4>
+                      <p className="text-xs text-[#5c3f41]">Tailored itineraries that reflect your unique narrative.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-sm text-[#1a1c1c]">Exclusive Access</h4>
+                      <p className="text-xs text-[#5c3f41]">Entry to private estates and closed collections.</p>
+                    </div>
+                  </div>
                 </div>
-                <span className="font-headline font-bold text-sm text-primary">£320</span>
+              </div>
+              <div className="lg:col-span-6">
+                <div className="relative aspect-video rounded-xl overflow-hidden shadow-md">
+                  <img 
+                    alt="Concierge service details" 
+                    className="w-full h-full object-cover" 
+                    src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          </section>
+
+          {/* Guest Stories / Verified Moments */}
+          <section className="space-y-12">
+            <div className="text-center max-w-2xl mx-auto space-y-4">
+              <span className="text-xs font-bold uppercase tracking-widest text-primary">Guest Stories</span>
+              <h2 className="font-headline text-3xl font-bold text-[#1a1c1c]">Verified Moments</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  quote: "The private vineyard dinner was like stepping into a movie. LuxeStay found a spot we would never have discovered on our own. Pure magic.",
+                  author: "Elena Moretti",
+                  loc: "Milan, Italy",
+                  img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400"
+                },
+                {
+                  quote: "The sailing excursion wasn't just a boat ride; it was a masterclass in hospitality. The crew knew exactly when to provide service and when to leave us in peace.",
+                  author: "James Lowery",
+                  loc: "London, UK",
+                  img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400"
+                },
+                {
+                  quote: "LuxeStay's attention to our children's curiosity during the museum tour made it their favorite part of the trip. Incredible pedagogical luxury.",
+                  author: "Sarah Williams",
+                  loc: "NYC, USA",
+                  img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400"
+                }
+              ].map((story, i) => (
+                <div key={i} className="p-6 rounded-2xl bg-white border border-outline-variant/10 space-y-6 shadow-sm hover:shadow-md transition-all">
+                  <div className="aspect-[4/3] rounded-xl overflow-hidden bg-surface-container">
+                    <img className="w-full h-full object-cover" src={story.img} alt={story.author} />
+                  </div>
+                  <blockquote className="text-sm text-[#5c3f41] leading-relaxed italic">
+                    "{story.quote}"
+                  </blockquote>
+                  <div>
+                    <h4 className="font-bold text-[#1a1c1c] text-sm">{story.author}</h4>
+                    <p className="text-[10px] font-bold text-outline tracking-wider uppercase mt-0.5">{story.loc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* CTA Section */}
+          <section className="bg-[#1a1c1c] text-white p-12 md:p-16 rounded-3xl text-center space-y-8 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent pointer-events-none" />
+            <h2 className="font-display font-extrabold text-4xl md:text-6xl tracking-tight relative z-10">
+              Enrich Your Narrative
+            </h2>
+            <p className="text-white/80 text-sm max-w-xl mx-auto relative z-10">
+              Your next great story begins with a single conversation. Connect with our editorial team to begin curating your journey.
+            </p>
+            <div className="flex gap-4 justify-center relative z-10">
+              <button className="px-8 py-4 bg-[#ba0036] text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-md hover:bg-primary transition-all">
+                Book via Concierge
+              </button>
+            </div>
+          </section>
         </div>
       );
 
