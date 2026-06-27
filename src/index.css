@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ── Obsidian Rose (Public) ── */
+  --color-primary: #ba0036;
+  --color-primary-container: #e21e4a;
+  --color-secondary: #375ca8;
+  --color-surface: #f9f9f9;
+  --color-surface-container-low: #f3f3f3;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container: #eeeeee;
+  --color-on-surface: #1a1c1c;
+  --color-on-surface-variant: #5c3f41;
+  --color-outline-variant: #e5bdbe;
+
+  /* ── Obsidian (Admin) ── */
+  --color-admin-primary: #3525cd;
+  --color-admin-primary-container: #4f46e5;
+  --color-admin-surface: #f7f9fb;
+  --color-admin-surface-low: #f2f4f6;
+}
+
+@layer base {
+  body {
+    @apply font-body text-on_surface bg-surface antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: #ffdada;
+    color: #40000d;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headline tracking-tight;
+  }
+}
+
+@layer components {
+  /* ── Buttons ── */
+  .btn-primary-gradient {
+    background: linear-gradient(135deg, #ba0036 0%, #e21e4a 100%);
+    @apply text-white font-semibold transition-all duration-300;
+  }
+
+  .btn-admin-gradient {
+    background: linear-gradient(135deg, #3525cd 0%, #4f46e5 100%);
+    @apply text-white font-semibold transition-all duration-300;
+  }
+
+  .btn-hover:hover {
+    transform: scale(1.02);
+    transition: transform 400ms cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .btn-primary {
+    @apply btn-primary-gradient py-3 px-6 rounded-xl btn-hover;
+  }
+
+  .btn-secondary {
+    @apply border border-outline-variant/30 text-on_surface font-semibold py-3 px-6 rounded-full hover:bg-surface-container-low transition-all duration-300;
+  }
+
+  .btn-tertiary {
+    @apply text-primary font-medium py-3 px-6 transition-all duration-200 hover:bg-surface-container-low rounded-lg;
+  }
+
+  /* ── Glass Panel ── */
+  .glass-panel {
+    background-color: rgba(249, 249, 249, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* ── Input Fields ── */
+  .input-field {
+    @apply bg-surface-container-lowest border-0 rounded-lg py-3 px-4 w-full transition-all duration-200;
+    @apply focus:ring-2 focus:ring-primary/40 focus:outline-none;
+  }
+
+  /* ── Status Badges ── */
+  .status-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider;
+  }
+
+  .badge-success {
+    @apply bg-tertiary/10 text-tertiary;
+  }
+
+  .badge-warning {
+    @apply bg-amber-500/10 text-amber-600;
+  }
+
+  .badge-error {
+    @apply bg-error/10 text-error;
+  }
+
+  .badge-info {
+    @apply bg-secondary/10 text-secondary;
+  }
+
+  .badge-neutral {
+    @apply bg-surface-container-high text-on_surface_variant;
+  }
+
+  /* ── Image Hover Zoom ── */
+  .img-hover-zoom {
+    overflow: hidden;
+  }
+
+  .img-hover-zoom > img,
+  .img-hover-zoom > div {
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .img-hover-zoom:hover > img,
+  .img-hover-zoom:hover > div {
+    transform: scale(1.05);
+  }
+
+  /* ── Data Tables (Admin — No-Line Rule) ── */
+  .data-table {
+    @apply w-full;
+  }
+
+  .data-table thead th {
+    @apply text-xs font-semibold uppercase tracking-wider text-on_surface_variant py-4 px-4 text-left;
+  }
+
+  .data-table tbody tr {
+    @apply transition-colors duration-150 hover:bg-surface-container-low;
+  }
+
+  .data-table tbody td {
+    @apply py-4 px-4 text-sm;
+  }
+
+  /* ── KPI Cards ── */
+  .kpi-card {
+    @apply bg-surface-container-lowest rounded-xl p-6 shadow-ambient;
+  }
+
+  /* ── Admin Panel Surface ── */
+  .admin-surface {
+    background-color: var(--color-admin-surface);
+  }
+
+  .admin-card {
+    @apply bg-white rounded-xl shadow-ambient;
+  }
+}
+
+@layer utilities {
+  .no-border {
+    border: none !important;
+  }
+
+  .ghost-border {
+    @apply border border-outline-variant/15;
+  }
+
+  /* Hide scrollbar for category tabs */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Safe Zone spacing (editorial magazine feel) */
+  .safe-zone {
+    @apply px-8;
+  }
+
+  /* Material Icons sizing helper */
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+}
