@@ -37,6 +37,14 @@ export function Search() {
     }
   }, [focusRoomIdFromQuery]);
 
+  // Sync URL query parameters to the filter store
+  useEffect(() => {
+    const queryLocation = searchParams.get('location');
+    if (queryLocation) {
+      filters.setLocation(queryLocation);
+    }
+  }, [searchParams]);
+
   const handleSelectRoom = (roomId: string) => {
     setFocusedRoomId(roomId);
     setSearchParams({ focus: roomId });

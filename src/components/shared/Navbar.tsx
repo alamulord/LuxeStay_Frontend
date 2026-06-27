@@ -33,22 +33,22 @@ export function Navbar() {
             {/* Center Navigation */}
             <div className="hidden md:flex items-center gap-8">
               <Link
-                to="/search"
-                className="text-sm font-medium text-[#1a1c1c] hover:text-primary transition-colors duration-200"
-              >
-                Host
-              </Link>
-              <Link
-                to="/search"
+                to="/info/immersive-experiences"
                 className="text-sm font-medium text-[#1a1c1c] hover:text-primary transition-colors duration-200"
               >
                 Experiences
               </Link>
               <Link
-                to="/about"
+                to="/info/support-safety"
                 className="text-sm font-medium text-[#1a1c1c] hover:text-primary transition-colors duration-200"
               >
-                Help
+                Concierge
+              </Link>
+              <Link
+                to="/info/about-our-vision"
+                className="text-sm font-medium text-[#1a1c1c] hover:text-primary transition-colors duration-200"
+              >
+                About
               </Link>
             </div>
 
@@ -184,8 +184,9 @@ export function Navbar() {
                 </>
               )}
               <div className="border-t border-outline-variant/10 pt-4 mt-2">
-                <Link to="/search" className="block px-4 py-3 text-sm hover:bg-surface-container-low rounded-lg" onClick={closeMobileMenu}>Explore</Link>
-                <Link to="/about" className="block px-4 py-3 text-sm hover:bg-surface-container-low rounded-lg" onClick={closeMobileMenu}>Help</Link>
+                <Link to="/info/immersive-experiences" className="block px-4 py-3 text-sm hover:bg-surface-container-low rounded-lg" onClick={closeMobileMenu}>Experiences</Link>
+                <Link to="/info/support-safety" className="block px-4 py-3 text-sm hover:bg-surface-container-low rounded-lg" onClick={closeMobileMenu}>Concierge</Link>
+                <Link to="/info/about-our-vision" className="block px-4 py-3 text-sm hover:bg-surface-container-low rounded-lg" onClick={closeMobileMenu}>About</Link>
               </div>
             </div>
           </div>
