@@ -30,6 +30,7 @@ const Stories = lazy(() => import('./pages/stories').then(m => ({ default: m.Sto
 const ImmersiveExperiences = lazy(() => import('./pages/immersive-experiences').then(m => ({ default: m.ImmersiveExperiences })));
 const InnerCircle = lazy(() => import('./pages/inner-circle').then(m => ({ default: m.InnerCircle })));
 const CuratedPortfolio = lazy(() => import('./pages/curated-portfolio').then(m => ({ default: m.CuratedPortfolio })));
+const Concierge = lazy(() => import('./pages/concierge').then(m => ({ default: m.Concierge })));
 const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
 
 // Lazy loaded views for route chunking
@@ -93,6 +94,7 @@ function App() {
                 <Route path="/immersive-experiences" element={<ImmersiveExperiences />} />
                 <Route path="/inner-circle" element={<InnerCircle />} />
                 <Route path="/curated-portfolio" element={<CuratedPortfolio />} />
+                <Route path="/concierge" element={<Concierge />} />
                 
                 {/* Auth Protected User Routes */}
                 <Route path="/dashboard/trips" element={

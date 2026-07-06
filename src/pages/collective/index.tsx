@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Compass, DollarSign, Award, Users, ArrowRight, Check, CheckCircle, Verified, Calendar } from 'lucide-react';
+import { ShieldCheck, Compass, DollarSign, Award, Users, ArrowRight, Check, CheckCircle, Verified, Calendar, ChevronDown } from 'lucide-react';
 import { Navbar } from '../../components/shared/Navbar';
 import { Footer } from '../../components/shared/Footer';
 
@@ -278,16 +278,21 @@ export function Collective() {
                 <div className='space-y-4 pt-2'>
                   <div>
                     <label className='block text-[10px] font-bold uppercase tracking-wider text-[#cfc9bc] mb-2'>Location</label>
-                    <select
-                      value={estLocation}
-                      onChange={(e) => setEstLocation(e.target.value)}
-                      className='w-full bg-[#1c1d1d] border-0 rounded-xl py-3.5 px-4 text-[#f4f3ef] focus:ring-1 focus:ring-[#c5a880] focus:outline-none text-sm'
-                    >
-                      <option value="Paris">Paris, France</option>
-                      <option value="Santorini">Santorini, Greece</option>
-                      <option value="Bali">Bali, Indonesia</option>
-                      <option value="Oregon">Bend, Oregon</option>
-                    </select>
+                    <div className='relative'>
+                      <select
+                        value={estLocation}
+                        onChange={(e) => setEstLocation(e.target.value)}
+                        className='w-full appearance-none bg-[#1c1d1d] border-0 rounded-xl py-3.5 pl-4 pr-12 text-[#f4f3ef] focus:ring-1 focus:ring-[#c5a880] focus:outline-none text-sm cursor-pointer'
+                      >
+                        <option value="Paris">Paris, France</option>
+                        <option value="Santorini">Santorini, Greece</option>
+                        <option value="Bali">Bali, Indonesia</option>
+                        <option value="Oregon">Bend, Oregon</option>
+                      </select>
+                      <div className='absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#cfc9bc]/60'>
+                        <ChevronDown className='w-4 h-4' />
+                      </div>
+                    </div>
                   </div>
                   <div>
                     <label className='block text-[10px] font-bold uppercase tracking-wider text-[#cfc9bc] mb-2'>Bedrooms</label>
@@ -396,12 +401,17 @@ export function Collective() {
                       </div>
                       <div className='space-y-2'>
                         <label className='block text-[10px] font-bold uppercase tracking-wider text-[#cfc9bc]'>Property Type</label>
-                        <select className='w-full bg-[#1c1d1d] border-0 rounded-xl py-3.5 px-4 text-[#f4f3ef] focus:ring-1 focus:ring-primary focus:outline-none text-sm'>
-                          <option>Beachfront Villa</option>
-                          <option>Urban Penthouse</option>
-                          <option>Alpine Chalet</option>
-                          <option>Historical Manor</option>
-                        </select>
+                        <div className='relative'>
+                          <select className='w-full appearance-none bg-[#1c1d1d] border-0 rounded-xl py-3.5 pl-4 pr-12 text-[#f4f3ef] focus:ring-1 focus:ring-primary focus:outline-none text-sm cursor-pointer'>
+                            <option>Beachfront Villa</option>
+                            <option>Urban Penthouse</option>
+                            <option>Alpine Chalet</option>
+                            <option>Historical Manor</option>
+                          </select>
+                          <div className='absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#cfc9bc]/60'>
+                            <ChevronDown className='w-4 h-4' />
+                          </div>
+                        </div>
                       </div>
                     </div>
                     

@@ -42,7 +42,7 @@ export function Navbar() {
                 Experiences
               </Link>
               <Link
-                to="/sustainability"
+                to="/concierge"
                 className="text-sm font-headline font-semibold text-on-surface hover:text-primary transition-colors duration-200"
               >
                 Concierge
@@ -230,7 +230,7 @@ export function Navbar() {
                   Experiences
                 </Link>
                 <Link
-                  to="/sustainability"
+                  to="/concierge"
                   className="block px-4 py-3 text-sm hover:bg-surface-container-low rounded-lg"
                   onClick={closeMobileMenu}
                 >
