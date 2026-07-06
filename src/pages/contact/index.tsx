@@ -317,9 +317,9 @@ export function Contact() {
               <button className='bg-primary text-white px-8 py-3.5 rounded-xl font-headline font-bold text-xs uppercase tracking-wider shadow-md hover:scale-105 transition-transform btn-primary-gradient'>
                 Chat with Concierge
               </button>
-              <button className='bg-white text-on-surface border border-outline-variant/20 px-8 py-3.5 rounded-xl font-headline font-bold text-xs uppercase tracking-wider hover:bg-surface-container-high transition-colors'>
+              {/* <button className='bg-white text-on-surface border border-outline-variant/20 px-8 py-3.5 rounded-xl font-headline font-bold text-xs uppercase tracking-wider hover:bg-surface-container-high transition-colors'>
                 Call Priority Support
-              </button>
+              </button> */}
             </div>
           </div>
         </section>
