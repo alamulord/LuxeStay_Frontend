@@ -12,6 +12,7 @@ interface AuthState {
   register: (data: { email: string; password: string; firstName: string; lastName: string }) => Promise<void>;
   logout: () => void;
   fetchProfile: () => Promise<void>;
+  updateProfile: (data: { firstName: string; lastName: string; phone?: string; dateOfBirth?: string; avatar?: string }) => Promise<void>;
   refreshSession: () => Promise<void>;
 }
 
@@ -61,6 +62,17 @@ export const useAuthStore = create<AuthState>()(
           set({ user: response.data, isAuthenticated: true, isLoading: false });
         } catch (error) {
           set({ isLoading: false });
+        }
+      },
+
+      updateProfile: async (data: { firstName: string; lastName: string; phone?: string; dateOfBirth?: string; avatar?: string }) => {
+        set({ isLoading: true });
+        try {
+          const response = await api.put<User>('/auth/profile', data);
+          set({ user: response.data, isLoading: false });
+        } catch (error) {
+          set({ isLoading: false });
+          throw error;
         }
       },
 

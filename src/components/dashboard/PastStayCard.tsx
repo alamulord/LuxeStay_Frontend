@@ -1,69 +1,65 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Star, ArrowRight } from 'lucide-react';
+import { Star, ArrowRight } from 'lucide-react';
 import { Booking } from '../../types/booking.types';
 import { formatDate, formatCurrency } from '../../lib/utils';
 
 interface PastStayCardProps {
   booking: Booking;
+  onReceiptClick: (booking: Booking) => void;
 }
 
-export function PastStayCard({ booking }: PastStayCardProps) {
+export function PastStayCard({ booking, onReceiptClick }: PastStayCardProps) {
   return (
-    <div className="bg-surface-container-lowest rounded-lg p-6">
-      <div className="flex items-center justify-between mb-4">
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-          Completed
-        </span>
-        <span className="text-on_surface_variant text-sm">
-          {formatDate(booking.checkOutDate)}
-        </span>
-      </div>
-
+    <div className="bg-white border border-slate-100 rounded-2xl p-4 flex flex-col justify-between hover:shadow-md transition-all duration-300 group">
+      {/* Top Section: Image and Info */}
       <div className="flex gap-4">
-        <img
-          src={booking.room.images[0]}
-          alt={booking.room.title}
-          className="w-24 h-24 rounded-md object-cover"
-        />
-        <div>
-          <h3 className="font-semibold mb-1">{booking.room.title}</h3>
-          <div className="flex items-center gap-2 mb-2">
-            <p className="text-sm text-on_surface_variant flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-primary shrink-0" />
-              {booking.room.city}, {booking.room.country}
-            </p>
-            {booking.room.latitude !== undefined && booking.room.latitude !== null && (
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${booking.room.latitude},${booking.room.longitude}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[10px] text-primary font-bold uppercase hover:underline ml-2"
-                onClick={(e) => e.stopPropagation()}
-              >
-                Maps
-              </a>
-            )}
+        {/* Image */}
+        <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-slate-50 relative">
+          <img 
+            src={booking.room.images[0]} 
+            alt={booking.room.title}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          />
+          <span className="absolute top-1 left-1 px-1.5 py-0.5 bg-black/75 backdrop-blur-md text-[8px] font-bold text-white uppercase tracking-wider rounded">
+            Past
+          </span>
+        </div>
+
+        {/* Info */}
+        <div className="flex-grow min-w-0">
+          <div className="flex gap-0.5 text-amber-500 mb-0.5">
+            <Star className="w-3 h-3 fill-current" />
+            <Star className="w-3 h-3 fill-current" />
+            <Star className="w-3 h-3 fill-current" />
+            <Star className="w-3 h-3 fill-current" />
+            <Star className="w-3 h-3 fill-current" />
           </div>
-          <p className="text-sm">
-            {formatCurrency(booking.totalPrice)} paid
+          <h4 className="font-extrabold text-[#1a1c1c] text-sm group-hover:text-primary transition-colors leading-tight truncate">
+            {booking.room.title}
+          </h4>
+          <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
+            {booking.room.city} • {formatDate(booking.checkInDate)}
+          </p>
+          <p className="text-xs font-black text-[#1a1c1c] mt-1">
+            {formatCurrency(booking.totalPrice)}
           </p>
         </div>
       </div>
 
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-outline_variant/15">
-        <Link
-          to={`/room/${booking.roomId}/review`}
-          className="flex items-center gap-1 text-primary hover:underline"
+      {/* Bottom Section: Separator and Full-Width Buttons */}
+      <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100">
+        <button 
+          onClick={() => onReceiptClick(booking)}
+          className="flex-1 py-1.5 border border-slate-200 text-[#1a1c1c] hover:bg-slate-50 rounded-lg text-[11px] font-bold transition-all text-center"
         >
-          <Star className="w-4 h-4" />
-          Leave a review
-        </Link>
-        <Link
+          Receipt
+        </button>
+        <Link 
           to={`/room/${booking.roomId}`}
-          className="flex items-center gap-1 text-primary hover:underline"
+          className="flex-1 py-1.5 bg-[#ba0036] text-white hover:bg-[#900028] rounded-lg text-[11px] font-bold transition-all text-center flex items-center justify-center gap-1 shadow-sm shadow-[#ba0036]/10"
         >
-          Book again <ArrowRight className="w-4 h-4" />
+          Book Again <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
     </div>

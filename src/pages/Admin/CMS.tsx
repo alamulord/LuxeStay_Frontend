@@ -4,6 +4,7 @@ import { AdminTopBar } from '../../components/admin/AdminTopBar';
 import api from '../../lib/api';
 import { FileText, Plus, Edit, Trash, X, ToggleLeft, ToggleRight } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { PremiumButton } from '../../components/ui/PremiumButton';
 
 interface CMSItem {
   id: string;
@@ -112,7 +113,7 @@ export function AdminCMS() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f9fb] flex">
+    <div className="min-h-screen bg-surface flex">
       <AdminSidebar />
 
       <div className="flex-1 ml-[260px]">
@@ -121,39 +122,41 @@ export function AdminCMS() {
         <main className="p-8">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h2 className="font-headline text-2xl font-bold text-[#191c1e]">Static Page Editor</h2>
-              <p className="text-sm text-[#464555] mt-0.5 font-medium">Publish, edit, and maintain custom platform content blocks</p>
+              <h2 className="font-headline text-2xl font-bold text-on-surface">Static Page Editor</h2>
+              <p className="text-sm text-on-surface-variant mt-0.5 font-body">Publish, edit, and maintain custom platform content blocks</p>
             </div>
-            <button
+            <PremiumButton
               onClick={() => {
                 resetForm();
                 setIsModalOpen(true);
               }}
-              className="flex items-center gap-2 bg-gradient-to-r from-admin-primary to-admin-primary-container text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity shadow-sm"
+              variant="admin"
+              size="md"
+              className="flex items-center gap-2"
             >
               <Plus className="w-4 h-4" /> Create Content Block
-            </button>
+            </PremiumButton>
           </div>
 
           {isLoading ? (
-            <div className="text-center py-12">Loading CMS blocks...</div>
+            <div className="text-center py-12 font-body text-on-surface-variant">Loading CMS blocks...</div>
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {cmsItems.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white p-6 rounded-xl shadow-ambient border border-slate-100 flex items-start justify-between group hover:border-indigo-100 transition-all"
+                  className="bg-surface-container-lowest p-6 rounded-2xl shadow-ambient border border-outline-variant/10 flex items-start justify-between group hover:border-primary/20 transition-all duration-300"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="p-3 bg-indigo-50 text-admin-primary rounded-lg">
+                    <div className="p-3 bg-primary/10 text-primary rounded-xl">
                       <FileText className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="font-bold font-plus text-md">{item.title}</h3>
-                      <p className="text-xs text-on_surface_variant mt-0.5">
-                        Slug: <span className="font-mono text-indigo-700 font-semibold">/{item.slug}</span> • Type: {item.type}
+                      <h3 className="font-headline font-bold text-base text-on-surface">{item.title}</h3>
+                      <p className="text-xs text-on-surface-variant mt-0.5 font-body">
+                        Slug: <span className="font-mono text-primary font-semibold">/{item.slug}</span> • Type: {item.type}
                       </p>
-                      <p className="text-sm text-on_surface_variant mt-3 line-clamp-2 max-w-2xl leading-relaxed">
+                      <p className="text-sm text-on-surface-variant mt-3 line-clamp-2 max-w-2xl leading-relaxed font-body">
                         {item.content.startsWith('{') ? '[Configuration Parameters]' : item.content}
                       </p>
                     </div>
@@ -164,7 +167,7 @@ export function AdminCMS() {
                       onClick={() => toggleActive(item)}
                       className={cn(
                         "p-1 rounded-full transition-colors",
-                        item.isActive ? "text-admin-primary" : "text-slate-300"
+                        item.isActive ? "text-primary" : "text-on-surface-variant/40"
                       )}
                       title={item.isActive ? 'Deactivate page' : 'Activate page'}
                     >
@@ -172,14 +175,14 @@ export function AdminCMS() {
                     </button>
                     <button
                       onClick={() => handleEdit(item)}
-                      className="p-2 hover:bg-surface-container-low rounded-lg text-slate-500 hover:text-indigo-600 transition-colors"
+                      className="p-2 hover:bg-surface-container-low rounded-xl text-on-surface-variant hover:text-primary transition-colors duration-200"
                       title="Edit Block"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(item)}
-                      className="p-2 hover:bg-red-50 rounded-lg text-slate-500 hover:text-red-600 transition-colors"
+                      className="p-2 hover:bg-error/10 rounded-xl text-on-surface-variant hover:text-error transition-colors duration-200"
                       title="Delete Block"
                     >
                       <Trash className="w-4 h-4" />
@@ -194,9 +197,9 @@ export function AdminCMS() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface-container-lowest rounded-2xl w-full max-w-2xl shadow-2xl p-6 animate-in zoom-in-95">
+          <div className="bg-surface-container-lowest rounded-2xl w-full max-w-2xl shadow-ambient-lg p-6 border border-outline-variant/10 animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold font-plus">
+              <h3 className="text-lg font-headline font-bold text-on-surface">
                 {editingItem ? `Edit Content: ${editingItem.title}` : 'Create Content Block'}
               </h3>
               <button
@@ -204,33 +207,33 @@ export function AdminCMS() {
                   setIsModalOpen(false);
                   resetForm();
                 }}
-                className="p-1 hover:bg-surface-container-low rounded-full transition-colors"
+                className="p-1.5 hover:bg-surface-container-low rounded-full transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 text-on-surface" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-on_surface_variant uppercase">Page Title</label>
+                  <label className="text-xs font-headline font-bold text-on-surface-variant uppercase tracking-wider">Page Title</label>
                   <input
                     type="text"
                     required
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full bg-surface-container-low border-none rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-primary/20"
+                    className="w-full bg-surface-container-low border-0 rounded-xl p-3 text-xs font-body text-on-surface focus:ring-1 focus:ring-primary focus:outline-none"
                     placeholder="About Us"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-on_surface_variant uppercase">Slug Identifier</label>
+                  <label className="text-xs font-headline font-bold text-on-surface-variant uppercase tracking-wider">Slug Identifier</label>
                   <input
                     type="text"
                     required
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
-                    className="w-full bg-surface-container-low border-none rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-primary/20"
+                    className="w-full bg-surface-container-low border-0 rounded-xl p-3 text-xs font-body text-on-surface focus:ring-1 focus:ring-primary focus:outline-none"
                     placeholder="about-us"
                   />
                 </div>
@@ -238,11 +241,11 @@ export function AdminCMS() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-on_surface_variant uppercase">Type</label>
+                  <label className="text-xs font-headline font-bold text-on-surface-variant uppercase tracking-wider">Type</label>
                   <select
                     value={type}
                     onChange={(e) => setType(e.target.value)}
-                    className="w-full bg-surface-container-low border-none rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-primary/20"
+                    className="w-full bg-surface-container-low border-0 rounded-xl p-3 text-xs font-body text-on-surface focus:ring-1 focus:ring-primary focus:outline-none"
                   >
                     <option value="page">Standard Page</option>
                     <option value="settings">System Config</option>
@@ -250,58 +253,60 @@ export function AdminCMS() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-on_surface_variant uppercase">Display Order</label>
+                  <label className="text-xs font-headline font-bold text-on-surface-variant uppercase tracking-wider">Display Order</label>
                   <input
                     type="number"
                     value={order}
                     onChange={(e) => setOrder(e.target.value)}
-                    className="w-full bg-surface-container-low border-none rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-primary/20"
+                    className="w-full bg-surface-container-low border-0 rounded-xl p-3 text-xs font-body text-on-surface focus:ring-1 focus:ring-primary focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-on_surface_variant uppercase">Content Markup / Value</label>
+                <label className="text-xs font-headline font-bold text-on-surface-variant uppercase tracking-wider">Content Markup / Value</label>
                 <textarea
                   required
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  className="w-full bg-surface-container-low border-none rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-primary/20"
+                  className="w-full bg-surface-container-low border-0 rounded-xl p-3 text-xs font-body text-on-surface focus:ring-1 focus:ring-primary focus:outline-none"
                   placeholder="Enter page body text or JSON config block..."
                   rows={8}
                 />
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 py-2">
                 <input
                   type="checkbox"
                   id="isActive"
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
-                  className="rounded text-primary focus:ring-primary/20 border-slate-300"
+                  className="rounded text-primary focus:ring-primary/20 border-outline-variant/30"
                 />
-                <label htmlFor="isActive" className="text-sm font-semibold cursor-pointer">
+                <label htmlFor="isActive" className="text-xs font-headline font-bold text-on-surface cursor-pointer select-none">
                   Publish (Active immediately)
                 </label>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                <button
+              <div className="flex justify-end gap-3 pt-4 border-t border-outline-variant/10">
+                <PremiumButton
                   type="button"
+                  variant="secondary"
+                  size="sm"
                   onClick={() => {
                     setIsModalOpen(false);
                     resetForm();
                   }}
-                  className="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg text-sm font-semibold transition-all"
                 >
                   Cancel
-                </button>
-                <button
+                </PremiumButton>
+                <PremiumButton
                   type="submit"
-                  className="px-6 py-2 bg-primary text-white rounded-lg text-sm font-semibold shadow-md hover:bg-primary/95 transition-all"
+                  variant="admin"
+                  size="sm"
                 >
                   Save
-                </button>
+                </PremiumButton>
               </div>
             </form>
           </div>

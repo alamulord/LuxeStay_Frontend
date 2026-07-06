@@ -13,6 +13,7 @@ interface AuthContextType {
   register: (data: { email: string; password: string; firstName: string; lastName: string }) => Promise<void>;
   logout: () => void;
   fetchProfile: () => Promise<void>;
+  updateProfile: (data: { firstName: string; lastName: string; phone?: string; dateOfBirth?: string; avatar?: string }) => Promise<void>;
   refreshSession: () => Promise<void>;
 }
 
@@ -24,7 +25,7 @@ const SESSION_REFRESH_INTERVAL_MS = 90_000;
 export function AuthProvider({ children }: { children: ReactNode }) {
   const {
     user, token, isAuthenticated, isLoading,
-    login, register, logout, fetchProfile, refreshSession,
+    login, register, logout, fetchProfile, refreshSession, updateProfile,
   } = useAuthStore();
   const fetchWishlist = useWishlistStore((state) => state.fetchWishlist);
   const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -111,6 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         register,
         logout,
         fetchProfile,
+        updateProfile,
         refreshSession,
       }}
     >

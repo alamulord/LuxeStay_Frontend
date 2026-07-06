@@ -17,14 +17,22 @@ export function DashboardSidebar() {
   const { user, logout } = useAuth();
 
   return (
-    <div className="bg-surface-container-lowest rounded-lg p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-semibold">
-          {user?.firstName?.[0]}{user?.lastName?.[0]}
-        </div>
-        <div>
-          <p className="font-medium">{user?.firstName} {user?.lastName}</p>
-          <p className="text-sm text-on_surface_variant">{user?.email}</p>
+    <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/10">
+      <div className="flex items-center gap-3 p-3 bg-surface rounded-xl border border-outline-variant/10 mb-6">
+        {user?.avatar ? (
+          <img 
+            src={user.avatar} 
+            alt="Profile avatar" 
+            className="w-10 h-10 rounded-full object-cover border shrink-0 bg-slate-50"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-[#ba0036] flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-sm">
+            {user?.firstName?.[0]}{user?.lastName?.[0]}
+          </div>
+        )}
+        <div className="min-w-0">
+          <p className="font-bold text-sm text-[#1a1c1c] truncate">{user?.firstName} {user?.lastName}</p>
+          <p className="text-[10px] text-[#ba0036] font-bold uppercase tracking-wider mt-0.5">Premium Member</p>
         </div>
       </div>
 

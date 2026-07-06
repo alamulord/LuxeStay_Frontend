@@ -6,16 +6,30 @@ import { ErrorBoundary } from './components/shared/ErrorBoundary';
 import { LoadingSpinner } from './components/shared/LoadingSpinner';
 import { ProtectedRoute } from './components/shared/ProtectedRoute';
 
-import { Home } from './pages/Home';
-import { Search } from './pages/Search';
-import { RoomDetails } from './pages/RoomDetails';
-import { Checkout } from './pages/Checkout';
-import { Confirmation } from './pages/Confirmation';
-import { Login } from './pages/Auth/Login';
-import { Signup } from './pages/Auth/Signup';
-import { About, Contact, Terms, Privacy } from './pages/StaticPages';
-import { NotFound } from './pages/NotFound';
-import { InfoPage } from './pages/InfoPage';
+const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
+const Search = lazy(() => import('./pages/Search').then(m => ({ default: m.Search })));
+const RoomDetails = lazy(() => import('./pages/RoomDetails').then(m => ({ default: m.RoomDetails })));
+const Checkout = lazy(() => import('./pages/Checkout').then(m => ({ default: m.Checkout })));
+const Confirmation = lazy(() => import('./pages/Confirmation').then(m => ({ default: m.Confirmation })));
+const Login = lazy(() => import('./pages/Auth/Login').then(m => ({ default: m.Login })));
+const Signup = lazy(() => import('./pages/Auth/Signup').then(m => ({ default: m.Signup })));
+const About = lazy(() => import('./pages/about').then(m => ({ default: m.About })));
+const Contact = lazy(() => import('./pages/contact').then(m => ({ default: m.Contact })));
+const Terms = lazy(() => import('./pages/terms').then(m => ({ default: m.Terms })));
+const Privacy = lazy(() => import('./pages/privacy').then(m => ({ default: m.Privacy })));
+const Safety = lazy(() => import('./pages/safety').then(m => ({ default: m.Safety })));
+const Cancellation = lazy(() => import('./pages/cancellation').then(m => ({ default: m.Cancellation })));
+const Legal = lazy(() => import('./pages/legal').then(m => ({ default: m.Legal })));
+const Collective = lazy(() => import('./pages/collective').then(m => ({ default: m.Collective })));
+const SignatureSeries = lazy(() => import('./pages/signature-series').then(m => ({ default: m.SignatureSeries })));
+const Careers = lazy(() => import('./pages/careers').then(m => ({ default: m.Careers })));
+const Press = lazy(() => import('./pages/press').then(m => ({ default: m.Press })));
+const Sustainability = lazy(() => import('./pages/sustainability').then(m => ({ default: m.Sustainability })));
+const Stories = lazy(() => import('./pages/stories').then(m => ({ default: m.Stories })));
+const ImmersiveExperiences = lazy(() => import('./pages/immersive-experiences').then(m => ({ default: m.ImmersiveExperiences })));
+const InnerCircle = lazy(() => import('./pages/inner-circle').then(m => ({ default: m.InnerCircle })));
+const CuratedPortfolio = lazy(() => import('./pages/curated-portfolio').then(m => ({ default: m.CuratedPortfolio })));
+const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
 
 // Lazy loaded views for route chunking
 const Trips = lazy(() => import('./pages/Dashboard/Trips').then(m => ({ default: m.Trips })));
@@ -66,7 +80,18 @@ function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
-                <Route path="/info/:slug" element={<InfoPage />} />
+                <Route path="/safety" element={<Safety />} />
+                <Route path="/cancellation" element={<Cancellation />} />
+                <Route path="/legal" element={<Legal />} />
+                <Route path="/collective" element={<Collective />} />
+                <Route path="/signature-series" element={<SignatureSeries />} />
+                <Route path="/careers" element={<Careers />} />
+                <Route path="/press" element={<Press />} />
+                <Route path="/sustainability" element={<Sustainability />} />
+                <Route path="/stories" element={<Stories />} />
+                <Route path="/immersive-experiences" element={<ImmersiveExperiences />} />
+                <Route path="/inner-circle" element={<InnerCircle />} />
+                <Route path="/curated-portfolio" element={<CuratedPortfolio />} />
                 
                 {/* Auth Protected User Routes */}
                 <Route path="/dashboard/trips" element={

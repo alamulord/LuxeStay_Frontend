@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Lock, CreditCard, Shield, Clock, Ban } from 'lucide-react';
+import { ArrowLeft, Lock, Shield, Clock, Ban } from 'lucide-react';
 import { Navbar } from '../components/shared/Navbar';
 import { LoadingSpinner } from '../components/shared/LoadingSpinner';
 import { useRoom } from '../hooks/useRooms';
@@ -9,6 +9,9 @@ import { useBookingStore } from '../store/bookingStore';
 import { useAuth } from '../contexts/AuthContext';
 import { formatCurrency, calculateNights } from '../lib/utils';
 import api from '../lib/api';
+import { CheckoutSummary } from '../components/booking/CheckoutSummary';
+import { CheckoutPaymentModal } from '../components/booking/CheckoutPaymentModal';
+import { PremiumButton } from '../components/ui/PremiumButton';
 
 export function Checkout() {
   const { id } = useParams<{ id: string }>();
@@ -121,7 +124,7 @@ export function Checkout() {
           {/* Back Link */}
           <Link
             to={`/room/${id}`}
-            className="inline-flex items-center gap-2 text-sm text-primary font-medium hover:underline mb-8"
+            className="inline-flex items-center gap-2 text-sm text-primary font-headline font-semibold hover:underline mb-8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Modify selection
@@ -130,7 +133,7 @@ export function Checkout() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-12">
             {/* ── Left Column ── */}
             <div className="space-y-10">
-              <h1 className="font-headline text-3xl md:text-4xl font-bold text-[#1a1c1c]">
+              <h1 className="font-headline text-3xl md:text-4xl font-extrabold text-on-surface tracking-tight leading-tight">
                 Confirm your journey
               </h1>
 
@@ -138,10 +141,10 @@ export function Checkout() {
               <div className="py-6 border-b border-outline-variant/10">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#5c3f41]">Dates</p>
-                    <p className="text-[#1a1c1c] font-medium mt-1">{formattedCheckIn} – {formattedCheckOut}</p>
+                    <p className="text-[10px] font-headline font-bold uppercase tracking-widest text-on-surface-variant">Dates</p>
+                    <p className="text-on-surface font-semibold font-headline mt-1">{formattedCheckIn} – {formattedCheckOut}</p>
                   </div>
-                  <Link to={`/room/${id}`} className="text-sm font-semibold text-primary hover:underline">
+                  <Link to={`/room/${id}`} className="text-sm font-headline font-semibold text-primary hover:underline">
                     Edit
                   </Link>
                 </div>
@@ -151,10 +154,10 @@ export function Checkout() {
               <div className="py-6 border-b border-outline-variant/10">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#5c3f41]">Guests</p>
-                    <p className="text-[#1a1c1c] font-medium mt-1">{guestCount} Adult{guestCount > 1 ? 's' : ''}</p>
+                    <p className="text-[10px] font-headline font-bold uppercase tracking-widest text-on-surface-variant">Guests</p>
+                    <p className="text-on-surface font-semibold font-headline mt-1">{guestCount} Guest{guestCount > 1 ? 's' : ''}</p>
                   </div>
-                  <Link to={`/room/${id}`} className="text-sm font-semibold text-primary hover:underline">
+                  <Link to={`/room/${id}`} className="text-sm font-headline font-semibold text-primary hover:underline">
                     Edit
                   </Link>
                 </div>
@@ -163,135 +166,90 @@ export function Checkout() {
               {/* Payment Method */}
               <div>
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="font-headline text-xl font-bold text-[#1a1c1c]">Choose how to pay</h2>
-                  <div className="flex items-center gap-1.5 text-xs text-[#5c3f41]">
+                  <h2 className="font-headline text-xl font-bold text-on-surface">Choose how to pay</h2>
+                  <div className="flex items-center gap-1.5 text-xs text-on-surface-variant">
                     <Lock className="w-3.5 h-3.5" />
-                    <span className="uppercase font-bold tracking-wider">Secure Checkout</span>
+                    <span className="font-headline font-bold uppercase tracking-wider">Secure Checkout</span>
                   </div>
                 </div>
 
                 {/* Card Option */}
                 <div
                   onClick={() => setPaymentMethod('card')}
-                  className={`p-5 rounded-xl border cursor-pointer transition-all duration-200 mb-4 ${
+                  className={`p-5 rounded-2xl border cursor-pointer transition-all duration-300 mb-4 ${
                     paymentMethod === 'card'
-                      ? 'border-primary/40 bg-primary/[0.02]'
+                      ? 'border-primary/30 bg-primary/[0.02] shadow-ambient-sm'
                       : 'border-outline-variant/20 hover:border-outline-variant/40'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                         paymentMethod === 'card' ? 'border-primary' : 'border-outline-variant/40'
                       }`}>
                         {paymentMethod === 'card' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
                       </div>
-                      <span className="font-medium text-[#1a1c1c]">Credit or Debit Card</span>
+                      <span className="font-headline font-bold text-on-surface text-sm">Credit or Debit Card</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold tracking-wider bg-surface-container-high px-2 py-0.5 rounded text-[#5c3f41]">VISA</span>
-                      <span className="text-[10px] font-bold tracking-wider bg-surface-container-high px-2 py-0.5 rounded text-[#5c3f41]">MC</span>
+                    <div className="flex items-center gap-2 text-[10px] font-headline font-bold tracking-wider text-on-surface-variant">
+                      <span className="bg-surface-container-high px-2.5 py-1 rounded-lg">VISA</span>
+                      <span className="bg-surface-container-high px-2.5 py-1 rounded-lg">MC</span>
                     </div>
                   </div>
-
-                  {paymentMethod === 'card' && (
-                    <div className="space-y-4 mt-4">
-                      <input
-                        type="text"
-                        placeholder="Card number"
-                        value={cardNumber}
-                        onChange={(e) => {
-                          const formatted = e.target.value.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim();
-                          setCardNumber(formatted);
-                        }}
-                        maxLength={19}
-                        className="input-field"
-                      />
-                      <div className="grid grid-cols-2 gap-4">
-                        <input
-                          type="text"
-                          placeholder="Expiration"
-                          value={cardExpiry}
-                          onChange={(e) => {
-                            let val = e.target.value;
-                            if (val.length === 2 && !val.includes('/')) val += '/';
-                            setCardExpiry(val);
-                          }}
-                          maxLength={5}
-                          className="input-field"
-                        />
-                        <input
-                          type="password"
-                          placeholder="CVV"
-                          value={cardCvc}
-                          onChange={(e) => setCardCvc(e.target.value)}
-                          maxLength={4}
-                          className="input-field"
-                        />
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Alt Payment Options */}
                 <div className="grid grid-cols-2 gap-4">
-                  <button
-                    onClick={() => setPaymentMethod('apple')}
-                    className={`p-4 rounded-xl border text-center font-medium transition-all duration-200 ${
-                      paymentMethod === 'apple'
-                        ? 'border-primary/40 bg-primary/[0.02]'
-                        : 'border-outline-variant/20 hover:border-outline-variant/40'
-                    }`}
-                  >
-                    Apple Pay
-                  </button>
-                  <button
-                    onClick={() => setPaymentMethod('google')}
-                    className={`p-4 rounded-xl border text-center font-medium transition-all duration-200 ${
-                      paymentMethod === 'google'
-                        ? 'border-primary/40 bg-primary/[0.02]'
-                        : 'border-outline-variant/20 hover:border-outline-variant/40'
-                    }`}
-                  >
-                    Google Pay
-                  </button>
+                  {(['apple', 'google'] as const).map((method) => (
+                    <button
+                      key={method}
+                      onClick={() => setPaymentMethod(method)}
+                      className={`p-4 rounded-2xl border text-center font-headline font-bold text-sm transition-all duration-300 ${
+                        paymentMethod === method
+                          ? 'border-primary/30 bg-primary/[0.02] text-on-surface shadow-ambient-sm'
+                          : 'border-outline-variant/20 hover:border-outline-variant/40 text-on-surface-variant'
+                      }`}
+                    >
+                      {method === 'apple' ? 'Apple Pay' : 'Google Pay'}
+                    </button>
+                  ))}
                 </div>
               </div>
 
               {/* House Rules */}
-              <div>
-                <h2 className="font-headline text-xl font-bold text-[#1a1c1c] mb-4">Review house rules</h2>
-                <p className="text-sm text-[#5c3f41] mb-5">
+              <div className="space-y-6">
+                <h2 className="font-headline text-xl font-bold text-on-surface">Review house rules</h2>
+                <p className="text-sm text-on-surface-variant font-body leading-relaxed">
                   By selecting the button below, I agree to the{' '}
-                  <Link to="/terms" className="text-[#1a1c1c] underline font-medium">House Rules</Link>,{' '}
-                  <Link to="/terms" className="text-[#1a1c1c] underline font-medium">Ground Rules for Guests</Link>, and{' '}
-                  <Link to="/privacy" className="text-[#1a1c1c] underline font-medium">Privacy Policy</Link>.
+                  <Link to="/terms" className="text-on-surface underline font-semibold">House Rules</Link>,{' '}
+                  <Link to="/terms" className="text-on-surface underline font-semibold">Ground Rules for Guests</Link>, and{' '}
+                  <Link to="/privacy" className="text-on-surface underline font-semibold">Privacy Policy</Link>.
                 </p>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <Clock className="w-5 h-5 text-[#5c3f41]" />
+                    <Clock className="w-5 h-5 text-on-surface-variant" />
                     <div>
-                      <p className="text-sm font-semibold text-[#1a1c1c]">Check-in after 3:00 PM</p>
-                      <p className="text-xs text-[#5c3f41]">Self check-in with smart lock</p>
+                      <p className="text-sm font-headline font-bold text-on-surface">Check-in after 3:00 PM</p>
+                      <p className="text-xs text-on-surface-variant font-body mt-0.5">Self check-in with smart lock</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Ban className="w-5 h-5 text-[#5c3f41]" />
-                    <p className="text-sm font-semibold text-[#1a1c1c]">No smoking or parties</p>
+                    <Ban className="w-5 h-5 text-on-surface-variant" />
+                    <p className="text-sm font-headline font-bold text-on-surface">No smoking or parties allowed</p>
                   </div>
                 </div>
               </div>
 
               {/* Submit */}
-              <div>
-                <button
+              <div className="pt-4">
+                <PremiumButton
                   onClick={handleSubmit}
                   disabled={isProcessing}
-                  className="btn-primary-gradient px-10 py-4 rounded-xl font-bold text-white btn-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-10 py-4 font-headline text-xs font-bold uppercase tracking-wider"
                 >
                   {isProcessing ? <LoadingSpinner size="sm" /> : 'Confirm and Pay'}
-                </button>
-                <div className="flex items-center gap-4 mt-4 text-[10px] text-[#5c3f41] uppercase tracking-wider font-bold">
+                </PremiumButton>
+                <div className="flex items-center gap-4 mt-6 text-[10px] text-on-surface-variant font-headline font-bold uppercase tracking-wider">
                   <div className="flex items-center gap-1.5">
                     <Shield className="w-3.5 h-3.5" />
                     Norton Secured
@@ -305,169 +263,36 @@ export function Checkout() {
             </div>
 
             {/* ── Right Column — Price Summary ── */}
-            <div>
-              <div className="sticky top-24 bg-surface-container-lowest rounded-xl shadow-ambient p-6 space-y-5">
-                {/* Room Preview */}
-                <div className="flex gap-4">
-                  <img
-                    src={effectiveRoom.images[0] || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=200&h=200&fit=crop'}
-                    alt={effectiveRoom.title}
-                    className="w-28 h-24 object-cover rounded-lg flex-shrink-0"
-                  />
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-primary">
-                      {effectiveRoom.city}
-                    </p>
-                    <h3 className="font-headline text-base font-bold text-[#1a1c1c] leading-tight mt-0.5">
-                      {effectiveRoom.title}
-                    </h3>
-                    <div className="flex items-center gap-1 mt-1.5">
-                      <span className="text-xs font-medium">★ {effectiveRoom.rating.toFixed(2)}</span>
-                      <span className="text-xs text-[#5c3f41]">({effectiveRoom.reviewCount} reviews)</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border-t border-outline-variant/10" />
-
-                {/* Price Details */}
-                <div>
-                  <h4 className="font-headline font-bold text-[#1a1c1c] mb-4">Price details</h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#5c3f41]">{formatCurrency(pricePerNight)} x {nights} nights</span>
-                      <span className="text-[#1a1c1c]">{formatCurrency(subtotal)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#5c3f41] underline">Service fee</span>
-                      <span className="text-[#1a1c1c]">{formatCurrency(serviceFee)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#5c3f41]">Occupancy taxes</span>
-                      <span className="text-[#1a1c1c]">{formatCurrency(taxes)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border-t border-outline-variant/10" />
-
-                <div className="flex justify-between">
-                  <span className="font-bold text-[#1a1c1c]">Total (USD)</span>
-                  <span className="text-xl font-bold text-[#1a1c1c]">{formatCurrency(total)}</span>
-                </div>
-
-                {/* Cancellation Notice */}
-                <div className="bg-surface-container-low rounded-lg p-4 flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-primary text-xs font-bold">i</span>
-                  </div>
-                  <p className="text-xs text-[#5c3f41] leading-relaxed">
-                    <strong className="text-[#1a1c1c]">Free cancellation before {formattedCheckIn}.</strong>{' '}
-                    Get a full refund if you change your mind within the next 48 hours.
-                  </p>
-                </div>
-              </div>
-            </div>
+            <CheckoutSummary
+              room={effectiveRoom}
+              pricePerNight={pricePerNight}
+              nights={nights}
+              subtotal={subtotal}
+              serviceFee={serviceFee}
+              taxes={taxes}
+              total={total}
+              formattedCheckIn={formattedCheckIn}
+            />
           </div>
         </div>
       </main>
 
-      {/* ══════ CARD PAYMENT MODAL ══════ */}
+      {/* ══════ SECURE CARD PAYMENT MODAL ══════ */}
       {showCardModal && (
-        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-surface-container-lowest max-w-md w-full rounded-2xl shadow-ambient-lg overflow-hidden p-6 relative">
-            <button
-              onClick={() => setShowCardModal(false)}
-              className="absolute right-4 top-4 p-1 rounded-full hover:bg-surface-container-low transition-colors"
-            >
-              <svg className="w-5 h-5 text-[#1a1c1c]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            {paymentStep === 'input' && (
-              <form onSubmit={handleCardPayment} className="space-y-6">
-                <div>
-                  <h3 className="font-headline text-xl font-bold mb-1">Secure Payment</h3>
-                  <p className="text-xs text-[#5c3f41]">LuxeStay payment encryption service</p>
-                </div>
-
-                {/* Visual Card */}
-                <div className="bg-gradient-to-br from-primary via-primary-container to-[#1a1c1c] p-5 rounded-xl text-white shadow-md relative overflow-hidden h-40 flex flex-col justify-between">
-                  <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/5 pointer-events-none" />
-                  <div className="flex justify-between items-start">
-                    <span className="font-bold text-sm tracking-widest italic">LuxeStay Gold</span>
-                    <div className="w-8 h-6 bg-amber-200/80 rounded" />
-                  </div>
-                  <div className="font-mono text-base tracking-widest text-center">
-                    {cardNumber || '•••• •••• •••• ••••'}
-                  </div>
-                  <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-wider">
-                    <div>
-                      <p className="text-white/60">Expires</p>
-                      <p>{cardExpiry || 'MM/YY'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {paymentError && (
-                  <div className="text-xs text-error bg-error/5 p-2.5 rounded border border-error/10">
-                    {paymentError}
-                  </div>
-                )}
-
-                <div className="space-y-4">
-                  <input type="text" required placeholder="Card Number" value={cardNumber}
-                    onChange={(e) => {
-                      const formatted = e.target.value.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim();
-                      setCardNumber(formatted);
-                    }}
-                    maxLength={19} className="input-field" />
-                  <div className="grid grid-cols-2 gap-4">
-                    <input type="text" required placeholder="MM/YY" value={cardExpiry}
-                      onChange={(e) => {
-                        let val = e.target.value;
-                        if (val.length === 2 && !val.includes('/')) val += '/';
-                        setCardExpiry(val);
-                      }}
-                      maxLength={5} className="input-field" />
-                    <input type="password" required placeholder="CVV" value={cardCvc}
-                      onChange={(e) => setCardCvc(e.target.value)}
-                      maxLength={4} className="input-field" />
-                  </div>
-                </div>
-
-                <button type="submit" className="w-full btn-primary-gradient py-3 rounded-xl font-bold text-white">
-                  Pay {formatCurrency(createdBooking?.totalPrice || total)}
-                </button>
-              </form>
-            )}
-
-            {paymentStep === 'processing' && (
-              <div className="py-12 flex flex-col items-center justify-center text-center space-y-4">
-                <LoadingSpinner size="lg" />
-                <div>
-                  <h3 className="font-headline font-bold text-lg">Authorizing Payment</h3>
-                  <p className="text-xs text-[#5c3f41] mt-1">Connecting securely with bank gateways...</p>
-                </div>
-              </div>
-            )}
-
-            {paymentStep === 'success' && (
-              <div className="py-12 flex flex-col items-center justify-center text-center space-y-4">
-                <div className="w-16 h-16 bg-tertiary/10 text-tertiary rounded-full flex items-center justify-center">
-                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-headline font-bold text-lg text-tertiary">Booking Confirmed!</h3>
-                  <p className="text-xs text-[#5c3f41] mt-1">Directing to confirmation screen...</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <CheckoutPaymentModal
+          isOpen={showCardModal}
+          onClose={() => setShowCardModal(false)}
+          cardNumber={cardNumber}
+          setCardNumber={setCardNumber}
+          cardExpiry={cardExpiry}
+          setCardExpiry={setCardExpiry}
+          cardCvc={cardCvc}
+          setCardCvc={setCardCvc}
+          paymentStep={paymentStep}
+          paymentError={paymentError}
+          totalPrice={createdBooking?.totalPrice || total}
+          onSubmit={handleCardPayment}
+        />
       )}
     </div>
   );

@@ -103,7 +103,7 @@ export function FilterModal({ isOpen, onClose }: FilterModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#1a1c1c]/40 backdrop-blur-sm flex items-center justify-center p-4 md:p-6 overflow-hidden">
+    <div className="fixed inset-0 z-[9999] bg-[#1a1c1c]/40 backdrop-blur-sm flex items-center justify-center p-4 md:p-6 overflow-hidden">
       <div 
         className="bg-white w-full max-w-2xl rounded-2xl shadow-ambient-md flex flex-col max-h-[85vh] md:max-h-[90vh] overflow-hidden border border-outline-variant/10 animate-fade-in"
         onClick={(e) => e.stopPropagation()}

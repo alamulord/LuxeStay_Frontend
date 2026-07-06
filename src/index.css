@@ -185,12 +185,46 @@
   }
 
   @media print {
-    .no-print {
+    .no-print, nav, footer, aside, header {
       display: none !important;
     }
-    body {
+    body, html, #root {
       background: white !important;
       color: black !important;
+      height: auto !important;
+      overflow: visible !important;
+    }
+    .print-modal-overlay {
+      position: static !important;
+      display: block !important;
+      background: transparent !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      width: 100% !important;
+      height: auto !important;
+    }
+    .print-receipt-card {
+      position: static !important;
+      display: block !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      width: 100% !important;
+      max-width: none !important;
+    }
+    .printable-receipt {
+      padding: 10mm !important;
+      background: white !important;
+    }
+    @page {
+      margin: 12mm !important;
+      size: portrait;
+    }
+    body {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
   }
 }

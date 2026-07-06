@@ -2,20 +2,42 @@ import { useState, useEffect } from 'react';
 import api from '../lib/api';
 import { Booking, CreateBookingRequest } from '../types/booking.types';
 
+// Module-level in-memory cache to store bookings across page instances
+let bookingsCache: Record<string, Booking[]> = {};
+let bookingsCacheTime: Record<string, number> = {};
+const CACHE_EXPIRATION_MS = 60 * 1000; // Cache valid for 1 minute
+
 export function useBookings(filters?: { status?: string }) {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const invalidateCache = () => {
+    bookingsCache = {};
+    bookingsCacheTime = {};
+  };
+
   useEffect(() => {
-    const fetchBookings = async () => {
+    const cacheKey = filters?.status || 'all';
+    
+    // If cache is valid, load from cache instantly to avoid loading states
+    if (bookingsCache[cacheKey]) {
+      setBookings(bookingsCache[cacheKey]);
+      setIsLoading(false);
+    } else {
       setIsLoading(true);
+    }
+
+    const fetchBookings = async () => {
       try {
         const params = new URLSearchParams();
         if (filters?.status) params.append('status', filters.status);
 
         const response = await api.get<Booking[]>(`/bookings/my-bookings?${params.toString()}`);
+        bookingsCache[cacheKey] = response.data;
+        bookingsCacheTime[cacheKey] = Date.now();
         setBookings(response.data);
+        setError(null);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -23,16 +45,21 @@ export function useBookings(filters?: { status?: string }) {
       }
     };
 
-    fetchBookings();
+    const lastFetch = bookingsCacheTime[cacheKey] || 0;
+    if (!bookingsCache[cacheKey] || Date.now() - lastFetch > CACHE_EXPIRATION_MS) {
+      fetchBookings();
+    }
   }, [filters?.status]);
 
   const createBooking = async (data: CreateBookingRequest) => {
     const response = await api.post<Booking>('/bookings/create', data);
+    invalidateCache();
     return response.data;
   };
 
   const cancelBooking = async (bookingId: string) => {
     const response = await api.post<Booking>(`/bookings/${bookingId}/cancel`);
+    invalidateCache();
     setBookings((prev) =>
       prev.map((b) => (b.id === bookingId ? { ...b, status: 'CANCELLED' } : b))
     );

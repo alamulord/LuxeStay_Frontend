@@ -15,7 +15,9 @@ export function Saved() {
 
       <main className="pt-20 px-4">
         <div className="max-w-7xl mx-auto py-8">
-          <h1 className="font-plus text-3xl font-bold mb-8">Saved homes</h1>
+          <h1 className="font-plus text-3xl md:text-4xl font-black tracking-tight mb-8 text-[#1a1c1c]">
+            Saved Stays
+          </h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div className="lg:col-span-1">
@@ -24,15 +26,15 @@ export function Saved() {
 
             <div className="lg:col-span-3">
               {items.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {items.map(room => (
                     <PropertyCard key={room.id} room={room} />
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-16 bg-surface-container-lowest rounded-lg">
-                  <p className="text-on_surface_variant mb-4">No saved homes yet</p>
-                  <Link to="/search" className="btn-primary">
+                <div className="text-center py-16 bg-surface-container-lowest rounded-3xl border border-outline-variant/10 p-8 shadow-sm">
+                  <p className="text-xs text-[#5c3f41] mb-6 font-medium">You haven't saved any luxury stays yet.</p>
+                  <Link to="/search" className="btn-primary-gradient px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider inline-block">
                     Start exploring
                   </Link>
                 </div>

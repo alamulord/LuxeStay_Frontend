@@ -1,25 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search as SearchIcon, X, Star, ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { Bot, MessageSquare } from 'lucide-react';
 import { Navbar } from '../components/shared/Navbar';
 import { Footer } from '../components/shared/Footer';
 import { PropertyCard } from '../components/search/PropertyCard';
-import { LoadingSpinner } from '../components/shared/LoadingSpinner';
+import { LoadingSkeleton } from '../components/ui/LoadingSkeleton';
 import { useRooms, prefetchRoom } from '../hooks/useRooms';
 import { useFilterStore } from '../store/filterStore';
 import { fadeIn, staggerContainer } from '../lib/animations';
 import { MapWidget } from '../components/search/MapWidget';
 import { FilterModal } from '../components/search/FilterModal';
+import { SearchAiConcierge } from '../components/ai/SearchAiConcierge';
+import { SearchFilterBar } from '../components/search/SearchFilterBar';
+import api from '../lib/api';
+import { Room } from '../types/room.types';
 
 export function Search() {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const focusRoomIdFromQuery = searchParams.get('focus');
+  const aiPromptFromQuery = searchParams.get('ai_prompt');
   const [focusedRoomId, setFocusedRoomId] = useState<string | null>(null);
 
+  // Traditional filter store
   const filters = useFilterStore();
-  const { rooms, isLoading, error } = useRooms({
+  const { rooms: traditionalRooms, isLoading: isTraditionalLoading, error: traditionalError } = useRooms({
     location: filters.location,
     guests: filters.guests,
     bedrooms: filters.bedrooms,
@@ -29,6 +35,13 @@ export function Search() {
     sortOrder: filters.sortOrder,
     amenities: filters.amenities,
   });
+
+  // AI Concierge State
+  const [isAiMode, setIsAiMode] = useState(false);
+  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
+  const [aiRooms, setAiRooms] = useState<(Room & { compatibilityScore?: number })[]>([]);
+  const [aiInput, setAiInput] = useState('');
+  const [isAiLoading, setIsAiLoading] = useState(false);
 
   // Sync focusRoomId from query params
   useEffect(() => {
@@ -45,200 +58,233 @@ export function Search() {
     }
   }, [searchParams]);
 
+  // Handle initial AI search prompt from URL query
+  useEffect(() => {
+    if (aiPromptFromQuery && chatMessages.length === 0) {
+      setIsAiMode(true);
+      handleSendAiSearch(decodeURIComponent(aiPromptFromQuery));
+      // Remove query parameter to prevent repeated triggers
+      const params = new URLSearchParams(searchParams);
+      params.delete('ai_prompt');
+      setSearchParams(params);
+    }
+  }, [aiPromptFromQuery]);
+
   const handleSelectRoom = (roomId: string) => {
     setFocusedRoomId(roomId);
-    setSearchParams({ focus: roomId });
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('focus', roomId);
+    setSearchParams(newParams);
     prefetchRoom(roomId);
   };
 
+  const handleSendAiSearch = async (userPrompt: string) => {
+    if (!userPrompt.trim()) return;
+
+    setIsAiLoading(true);
+    const updatedMessages = [...chatMessages, { role: 'user' as const, content: userPrompt }];
+    setChatMessages(updatedMessages);
+    setAiInput('');
+
+    try {
+      const response = await api.post('/ai-search', { messages: updatedMessages });
+      const reply = response.data.reply || "I've analyzed our portfolio for you.";
+      
+      setChatMessages([...updatedMessages, { role: 'assistant' as const, content: reply }]);
+      
+      if (response.data.results) {
+        setAiRooms(response.data.results);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setChatMessages([
+        ...updatedMessages,
+        { role: 'assistant' as const, content: "I encountered a connection issue. Let me try using our portfolio backup index to find the best matched Stays." }
+      ]);
+      // Fallback: copy traditional rooms
+      setAiRooms(traditionalRooms.map(r => ({ ...r, compatibilityScore: 85 })));
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const displayRooms = isAiMode ? aiRooms : traditionalRooms;
+  const isLoading = isAiMode ? isAiLoading : isTraditionalLoading;
+  const error = isAiMode ? null : traditionalError;
+
   return (
-    <div className="min-h-screen bg-surface flex flex-col">
+    <div className="min-h-screen bg-surface flex flex-col font-body">
       <Navbar />
 
-      {/* Main Split Screen Container */}
-      <main className="pt-[72px] h-[calc(100vh-72px)] flex overflow-hidden">
-        
-        {/* Left Side: Results List */}
-        <div className="w-full md:w-[50%] lg:w-[45%] h-full flex flex-col overflow-hidden bg-surface">
+      {/* Main Container - Standard Vertical Scroll */}
+      <main className="pt-[88px] flex-grow flex flex-col">
+        {/* Title & Mode Switcher Section */}
+        <div className="max-w-page mx-auto w-full px-6 lg:px-10 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-outline-variant/10">
+          <div className="flex gap-4">
+            <button
+              onClick={() => setIsAiMode(false)}
+              className={`pb-2 text-xs font-headline font-bold uppercase tracking-wider border-b-2 transition-all duration-300 ${
+                !isAiMode 
+                  ? 'border-primary text-primary' 
+                  : 'border-transparent text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              Filters Search
+            </button>
+            <button
+              onClick={() => setIsAiMode(true)}
+              className={`pb-2 text-xs font-headline font-bold uppercase tracking-wider border-b-2 transition-all duration-300 flex items-center gap-1.5 ${
+                isAiMode 
+                  ? 'border-primary text-primary' 
+                  : 'border-transparent text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              <Bot className="w-3.5 h-3.5" /> AI Concierge
+            </button>
+          </div>
           
-          {/* Filter Bar (Fixed inside Left Column Header) */}
-          <div className="px-6 lg:px-10 py-3.5 border-b border-outline-variant/10 flex-shrink-0 bg-white flex items-center justify-between">
-            <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar">
-              
-              {/* Sliders filter toggle button */}
-              <button
-                onClick={() => setIsFilterModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold border bg-white text-[#1a1c1c] border-outline-variant/30 hover:border-[#1a1c1c] transition-all duration-200 uppercase tracking-wider flex-shrink-0"
-              >
-                <SlidersHorizontal className="w-3.5 h-3.5 text-[#1a1c1c]" />
-                Filters
-              </button>
-
-              {/* Dynamic Badges */}
-              {filters.location && (
-                <span className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[10px] font-bold bg-primary/5 text-primary border border-primary/20 uppercase tracking-wider flex-shrink-0">
-                  {filters.location}
-                  <X className="w-3 h-3 cursor-pointer hover:text-black" onClick={() => filters.setLocation(undefined)} />
-                </span>
-              )}
-
-              {(filters.priceMin !== undefined || filters.priceMax !== undefined) && (
-                <span className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[10px] font-bold bg-primary/5 text-primary border border-primary/20 uppercase tracking-wider flex-shrink-0">
-                  {filters.priceMin && !filters.priceMax ? `> £${filters.priceMin}` : ''}
-                  {!filters.priceMin && filters.priceMax ? `< £${filters.priceMax}` : ''}
-                  {filters.priceMin && filters.priceMax ? `£${filters.priceMin}-£${filters.priceMax}` : ''}
-                  <X className="w-3 h-3 cursor-pointer hover:text-black" onClick={() => filters.setPriceRange(undefined, undefined)} />
-                </span>
-              )}
-
-              {filters.guests && (
-                <span className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[10px] font-bold bg-primary/5 text-primary border border-primary/20 uppercase tracking-wider flex-shrink-0">
-                  {filters.guests}+ guests
-                  <X className="w-3 h-3 cursor-pointer hover:text-black" onClick={() => filters.setGuests(undefined)} />
-                </span>
-              )}
-
-              {filters.bedrooms && (
-                <span className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[10px] font-bold bg-primary/5 text-primary border border-primary/20 uppercase tracking-wider flex-shrink-0">
-                  {filters.bedrooms} BR
-                  <X className="w-3 h-3 cursor-pointer hover:text-black" onClick={() => filters.setBedrooms(undefined)} />
-                </span>
-              )}
-
-              {filters.amenities && filters.amenities.map(amenity => (
-                <span key={amenity} className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[10px] font-bold bg-primary/5 text-primary border border-primary/20 uppercase tracking-wider flex-shrink-0">
-                  {amenity}
-                  <X className="w-3 h-3 cursor-pointer hover:text-black" onClick={() => {
-                    const next = filters.amenities?.filter(a => a !== amenity);
-                    filters.setAmenities(next && next.length > 0 ? next : undefined);
-                  }} />
-                </span>
-              ))}
-
-              {/* Clear All Shortcut if active */}
-              {(filters.location || filters.priceMin !== undefined || filters.priceMax !== undefined || filters.guests || filters.bedrooms || filters.amenities) && (
-                <button
-                  onClick={() => filters.resetFilters()}
-                  className="text-[10px] font-bold text-[#5c3f41] hover:underline uppercase tracking-wider pl-2 flex-shrink-0"
-                >
-                  Reset all
-                </button>
-              )}
-            </div>
-            <span className="hidden sm:inline text-xs font-semibold uppercase tracking-wider text-[#5c3f41] flex-shrink-0 ml-4">
-              {rooms.length} results
+          {!isAiMode && (
+            <span className="text-xs font-headline font-bold uppercase tracking-wider text-on-surface-variant">
+              {displayRooms.length} Stays Found
             </span>
+          )}
+        </div>
+
+        {/* Filter Bar (Traditional mode only) - Placed under header, full width */}
+        {!isAiMode && (
+          <div className="max-w-page mx-auto w-full px-6 lg:px-10 py-2 border-b border-outline-variant/10">
+            <SearchFilterBar
+              filters={filters}
+              onOpenFilterModal={() => setIsFilterModalOpen(true)}
+            />
           </div>
+        )}
 
-          {/* Listings Container (Scrollable) */}
-          <div className="flex-1 overflow-y-auto px-6 lg:px-10 py-6 hide-scrollbar space-y-6">
-            {/* Page Header */}
-            <div>
-              <h1 className="font-headline text-2xl lg:text-3xl font-extrabold text-[#1a1c1c] tracking-tight">
-                Exquisite Stays{filters.location ? ` in ${filters.location}` : ''}
-              </h1>
-              <p className="text-xs text-[#5c3f41] mt-1 font-medium">
-                Handpicked editorial collection of luxury retreats and modern boutiques.
-              </p>
-            </div>
+        {/* Side-by-Side Listings and Map Section */}
+        <div className="max-w-page mx-auto w-full px-6 lg:px-10 py-8 flex-grow">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_45%] gap-10 items-start">
+            
+            {/* Left Column: Listings List & AI Chat Panel */}
+            <div className="space-y-8">
+              
+              {/* Curation / Title Header */}
+              <div>
+                <h1 className="font-headline text-2xl lg:text-3xl font-extrabold text-on-surface tracking-tight leading-tight">
+                  {isAiMode ? 'AI Curation Results' : `Exquisite Stays${filters.location ? ` in ${filters.location}` : ''}`}
+                </h1>
+                <p className="text-[10px] text-on-surface-variant mt-1 font-headline font-bold uppercase tracking-widest">
+                  {isAiMode ? 'Curated based on your conversation with the AI concierge' : 'Handpicked editorial collection of luxury retreats and boutiques'}
+                </p>
+              </div>
 
-            {isLoading ? (
-              <div className="space-y-6">
-                {/* Large card skeleton */}
-                <div className="w-full h-[400px] bg-white rounded-2xl overflow-hidden border border-outline-variant/10 shadow-ambient animate-pulse flex flex-col">
-                  <div className="w-full h-64 bg-slate-200"></div>
-                  <div className="p-6 flex-1 flex flex-col justify-between">
-                    <div className="space-y-3">
-                      <div className="h-4 bg-slate-200 rounded w-1/4"></div>
-                      <div className="h-6 bg-slate-200 rounded w-3/4"></div>
-                      <div className="h-3 bg-slate-200 rounded w-1/2"></div>
-                    </div>
-                    <div className="flex justify-between items-center pt-4 border-t border-slate-100">
-                      <div className="h-6 bg-slate-200 rounded w-1/5"></div>
-                      <div className="h-8 bg-slate-200 rounded w-1/5"></div>
-                    </div>
+              {/* AI Concierge Chat Panel (AI Mode only) */}
+              {isAiMode && (
+                <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant/10 overflow-hidden shadow-ambient-md">
+                  <SearchAiConcierge
+                    chatMessages={chatMessages}
+                    aiInput={aiInput}
+                    setAiInput={setAiInput}
+                    isAiLoading={isAiLoading}
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleSendAiSearch(aiInput);
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* List of Stays */}
+              {isLoading && chatMessages.length === 0 ? (
+                <div className="space-y-6">
+                  <LoadingSkeleton variant="card" className="h-[360px]" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <LoadingSkeleton variant="card" className="h-[280px]" />
+                    <LoadingSkeleton variant="card" className="h-[280px]" />
                   </div>
                 </div>
-                {/* Small card skeletons */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="bg-white rounded-2xl overflow-hidden border border-outline-variant/10 shadow-ambient animate-pulse flex flex-col h-[340px]">
-                      <div className="w-full h-44 bg-slate-200"></div>
-                      <div className="p-5 flex-1 flex flex-col justify-between">
-                        <div className="space-y-3">
-                          <div className="h-4 bg-slate-200 rounded w-1/3"></div>
-                          <div className="h-5 bg-slate-200 rounded w-3/4"></div>
-                          <div className="h-3 bg-slate-200 rounded w-1/2"></div>
-                        </div>
-                        <div className="flex justify-between items-center pt-3 border-t border-slate-100">
-                          <div className="h-5 bg-slate-200 rounded w-1/4"></div>
-                          <div className="h-8 bg-slate-200 rounded w-1/4"></div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+              ) : error ? (
+                <div className="text-center py-20">
+                  <p className="text-error font-headline font-bold">{error}</p>
                 </div>
-              </div>
-            ) : error ? (
-              <div className="text-center py-20">
-                <p className="text-error font-medium">{error}</p>
-              </div>
-            ) : rooms.length === 0 ? (
-              <div className="text-center py-20 space-y-2">
-                <p className="text-[#5c3f41] text-base font-bold">No properties found matching your criteria.</p>
-                <p className="text-xs text-[#5c3f41]/60">Try adjusting your filters or search location.</p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {/* Asymmetric layout: Large card first */}
-                {rooms.length > 0 && (
-                  <div className="mb-4">
-                    <PropertyCard 
-                      room={rooms[0]} 
-                      variant="default" 
-                      focusedRoomId={focusedRoomId}
-                      onSelectRoom={handleSelectRoom}
-                    />
-                  </div>
-                )}
-
-                {/* Remaining Properties Grid */}
-                <motion.div
-                  variants={staggerContainer}
-                  initial="hidden"
-                  animate="visible"
-                  className="grid grid-cols-1 sm:grid-cols-2 gap-6"
-                >
-                  {rooms.slice(1).map((room) => (
-                    <motion.div key={room.id} variants={fadeIn}>
-                      <PropertyCard 
-                        room={room} 
-                        focusedRoomId={focusedRoomId}
-                        onSelectRoom={handleSelectRoom}
-                      />
+              ) : displayRooms.length === 0 ? (
+                <div className="text-center py-20 space-y-2">
+                  <MessageSquare className="w-10 h-10 text-primary/30 mx-auto" />
+                  <p className="text-on-surface-variant text-sm font-headline font-bold">No properties matched this description.</p>
+                  <p className="text-[11px] text-on-surface-variant/60 font-body">Try describing a location, specific amenities, or budget range.</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {isAiMode ? (
+                    <motion.div
+                      variants={staggerContainer}
+                      initial="hidden"
+                      animate="visible"
+                      className="grid grid-cols-1 sm:grid-cols-2 gap-6"
+                    >
+                      {displayRooms.map((room) => (
+                        <motion.div key={room.id} variants={fadeIn}>
+                          <PropertyCard 
+                            room={room} 
+                            focusedRoomId={focusedRoomId}
+                            onSelectRoom={handleSelectRoom}
+                            isAiMode={isAiMode}
+                          />
+                        </motion.div>
+                      ))}
                     </motion.div>
-                  ))}
-                </motion.div>
-              </div>
-            )}
+                  ) : (
+                    <>
+                      {/* Asymmetric layout: Large card first */}
+                      {displayRooms.length > 0 && (
+                        <div className="mb-4">
+                          <PropertyCard 
+                            room={displayRooms[0]} 
+                            variant="default" 
+                            focusedRoomId={focusedRoomId}
+                            onSelectRoom={handleSelectRoom}
+                          />
+                        </div>
+                      )}
 
-            {/* Inline Footer inside list scroll container */}
-            <div className="pt-12 border-t border-outline-variant/10 flex-shrink-0">
-              <Footer />
+                      {/* Remaining Properties Grid */}
+                      <motion.div
+                        variants={staggerContainer}
+                        initial="hidden"
+                        animate="visible"
+                        className="grid grid-cols-1 sm:grid-cols-2 gap-6"
+                      >
+                        {displayRooms.slice(1).map((room) => (
+                          <motion.div key={room.id} variants={fadeIn}>
+                            <PropertyCard 
+                              room={room} 
+                              focusedRoomId={focusedRoomId}
+                              onSelectRoom={handleSelectRoom}
+                            />
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    </>
+                  )}
+                </div>
+              )}
+
             </div>
+
+            {/* Right Column: Interactive Sticky Map */}
+            <div className="sticky top-[108px] hidden md:block w-full h-[670px] lg:h-[670px] rounded-[2rem] overflow-hidden shadow-ambient-lg border border-outline-variant/10 z-10 bg-surface-container-low">
+              <MapWidget 
+                rooms={displayRooms}
+                focusedRoomId={focusedRoomId}
+                onSelectRoom={handleSelectRoom}
+              />
+            </div>
+
           </div>
         </div>
-
-        {/* Right Side: Interactive Map */}
-        <div className="hidden md:block md:w-[50%] lg:w-[55%] h-full border-l border-outline-variant/15 relative">
-          <MapWidget 
-            rooms={rooms}
-            focusedRoomId={focusedRoomId}
-            onSelectRoom={handleSelectRoom}
-          />
-        </div>
-
       </main>
+
+      {/* Full Width Footer at the bottom */}
+      <Footer />
 
       <FilterModal 
         isOpen={isFilterModalOpen} 
