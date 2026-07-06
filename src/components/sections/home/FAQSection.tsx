@@ -41,24 +41,50 @@ export const FAQSection: React.FC = () => {
     }
   ];
 
+  const midPoint = 4;
+  const leftFaqs = faqs.slice(0, midPoint);
+  const rightFaqs = faqs.slice(midPoint);
+
   return (
-    <section className="max-w-[720px] mx-auto px-6 lg:px-10 py-12 mb-20 no-print select-none">
+    <section className="max-w-page mx-auto px-6 lg:px-10 py-12 mb-20 no-print select-none">
       <SectionHeading
         title="Common Inquiries"
         subtitle="Everything you need to know about the LuxeStay experience."
         className="mb-10"
       />
 
-      <div className="space-y-4">
-        {faqs.map((faq, index) => (
-          <FAQItem
-            key={index}
-            q={faq.q}
-            a={faq.a}
-            isOpen={activeFaq === index}
-            onToggle={() => setActiveFaq(activeFaq === index ? null : index)}
-          />
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        {/* Left Column */}
+        <div className="space-y-4">
+          {leftFaqs.map((faq, index) => {
+            const actualIndex = index;
+            return (
+              <FAQItem
+                key={actualIndex}
+                q={faq.q}
+                a={faq.a}
+                isOpen={activeFaq === actualIndex}
+                onToggle={() => setActiveFaq(activeFaq === actualIndex ? null : actualIndex)}
+              />
+            );
+          })}
+        </div>
+
+        {/* Right Column */}
+        <div className="space-y-4">
+          {rightFaqs.map((faq, index) => {
+            const actualIndex = midPoint + index;
+            return (
+              <FAQItem
+                key={actualIndex}
+                q={faq.q}
+                a={faq.a}
+                isOpen={activeFaq === actualIndex}
+                onToggle={() => setActiveFaq(activeFaq === actualIndex ? null : actualIndex)}
+              />
+            );
+          })}
+        </div>
       </div>
     </section>
   );
