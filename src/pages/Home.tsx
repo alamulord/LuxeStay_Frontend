@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home as HomeIcon, Trees, Waves, Castle, Droplets } from 'lucide-react';
+import { Home as HomeIcon, Trees, Waves, Castle, Droplets, Mail } from 'lucide-react';
 
 import { Navbar } from '../components/shared/Navbar';
 import { Footer } from '../components/shared/Footer';
@@ -14,7 +14,6 @@ import { TrendingSection } from '../components/sections/home/TrendingSection';
 import { DifferenceGrid } from '../components/sections/home/DifferenceGrid';
 import { EditorialGrid } from '../components/sections/home/EditorialGrid';
 import { FAQSection } from '../components/sections/home/FAQSection';
-import { InnerCircleSection } from '../components/sections/home/InnerCircleSection';
 
 const categories = [
   {
@@ -135,7 +134,37 @@ export function Home() {
         <FAQSection />
 
         {/* Members Club */}
-        <InnerCircleSection />
+        <section className="max-w-page mx-auto px-6 lg:px-10 mb-24">
+          <div className="btn-primary-gradient relative overflow-hidden rounded-[2rem] py-16 px-8 md:px-16 text-center text-white shadow-xl">
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none" />
+            
+            <div className="relative z-10 max-w-2xl mx-auto text-center">
+              <h2 className="font-headline text-3xl md:text-4xl font-extrabold mb-4">Join the Inner Circle</h2>
+              <p className="text-white/90 text-sm md:text-base mb-8">
+                Get early access to new property launches, exclusive member pricing, and private event invitations.
+              </p>
+              
+              <form onSubmit={(e) => e.preventDefault()} className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <div className="relative w-full sm:w-80">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant/50" />
+                  <input 
+                    className="w-full pl-11 pr-4 py-3.5 rounded-full border-none text-on-surface placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-white/50 text-sm" 
+                    placeholder="Enter your email" 
+                    type="email"
+                    required
+                  />
+                </div>
+                <button 
+                  type="submit"
+                  className="w-full sm:w-auto px-8 py-3.5 bg-on-surface text-white hover:bg-black rounded-full font-bold text-sm tracking-wide transition-all shadow-lg active:scale-95"
+                >
+                  Request Access
+                </button>
+              </form>
+              <p className="mt-4 text-[10px] text-white/50">By joining, you agree to our Terms and Privacy Policy.</p>
+            </div>
+          </div>
+        </section>
       </main>
 
       <Footer />

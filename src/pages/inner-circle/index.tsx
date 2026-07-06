@@ -1,22 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ArrowLeft, Key, Star, Users, CheckCircle, Compass, Shield, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Navbar } from '../../components/shared/Navbar';
 import { Footer } from '../../components/shared/Footer';
+import { InnerCircleSection } from '../../components/sections/home/InnerCircleSection';
 
 export function InnerCircle() {
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [interest, setInterest] = useState('Urban Retreats & Culture');
-  const [message, setMessage] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormSubmitted(true);
-  };
-
   return (
     <div className='min-h-screen bg-surface flex flex-col justify-between text-on-surface font-body select-none'>
       <Navbar />
@@ -178,121 +168,9 @@ export function InnerCircle() {
         </section>
 
         {/* ── LEAD CAPTURE FORM ── */}
-        <section className='py-24 max-w-page mx-auto px-6 lg:px-10' id='join'>
-          <div className='bg-surface-container-low shadow-ambient rounded-[2rem] overflow-hidden flex flex-col md:flex-row border border-outline-variant/10'>
-            <div className='md:w-1/2 p-10 md:p-16 flex flex-col justify-center text-left space-y-6'>
-              <h2 className='font-headline text-4xl md:text-5xl font-extrabold text-on-surface leading-[1.1]'>
-                Apply for <br />
-                <span className='text-primary'>Membership</span>
-              </h2>
-              <p className='font-body text-sm text-on-surface-variant leading-relaxed font-light'>
-                The Inner Circle is currently by invitation or application. Please provide your details below, and our membership concierge will contact you within 48 hours to discuss your preferences.
-              </p>
-              
-              <div className='flex items-center gap-4 pt-2'>
-                <div className='flex -space-x-3'>
-                  <div 
-                    className='w-10 h-10 rounded-full border-2 border-white bg-slate-300 bg-cover bg-center'
-                    style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuAC4uN0zQI4UyR2Uzngqsr1Z6kVZ9MUZ5M-FOcN-_E07UiXlXwQTo43kZWPCVt16OW02vlkQ8Cxvv8oREIN4Kx1dlILjZZ9UBV6phZtoyzUOzO121EoWfhJpmwp9SRjq7VDw8_vsXgqSTuR_1x5X1HagsxLAHkFxG8Hn506iEvQeSIOeuUN95hivnVtAASFJzMHhr3s_5cnhdifBmXMawXYGZonCU5qxsQwR2RBmz8-X4plrRDpNcjt0y6ItPP6Si1s7lSVI8uTUdRu')` }}
-                  />
-                  <div 
-                    className='w-10 h-10 rounded-full border-2 border-white bg-slate-400 bg-cover bg-center'
-                    style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuD3mnYp_SQOAHdcO9HRgVcCevmPPosCWmicLGBxrEQe_mMjKMUgvT4U5SH59_3GqE5YoNv1CBLrUv0Cv9zf0rJ0jvg3qp4zgvS1GttBA8z6l1QTD1wkvwfjWyasyJ5D4r8IRXtIuqdnr5m3FZsLkucrr1uO1w6Fk1vZyMqwvIOTxOPBEjEnlfC-wUpqyPL1g0XJ3G-Pvojs8OPmolU8M-4We29p4ot0S8XjRiA7zHHeCbzXqwPzm15O4oG5EJv8soWseHeQRZc3jHB8')` }}
-                  />
-                  <div 
-                    className='w-10 h-10 rounded-full border-2 border-white bg-slate-500 bg-cover bg-center'
-                    style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuCQMASd5L92SE0oYJBEu71CzuZNeNzwGNRmoZ9c4KPYFWErBb5_pV3NRbbhF5euYfJPNzh25Mu5w_Sdum8ABTecwA1pPrT-_4AnAq9vl1Equh2AHO0LB9h10OmObd0A9j7ej5NCvKFq_E5Kr39SHgbObG264bylQQxiUgJXezAdKvJfnPkcgLNOBXEPunYkcbl_9Fp7muDbszjRGFCA7jcRvdsU9ueQh7Cqt7NjTnRLCn_JvunYwwds464g4MVLKp9f0szRBcYnR4lP')` }}
-                  />
-                </div>
-                <p className='text-xs font-headline font-bold uppercase tracking-wider text-on-surface-variant'>
-                  <span className='text-on-surface font-extrabold'>4,000+</span> members worldwide
-                </p>
-              </div>
-            </div>
-            
-            <div className='md:w-1/2 bg-white p-10 md:p-16 border-l border-outline-variant/10 text-left'>
-              <AnimatePresence mode='wait'>
-                {formSubmitted ? (
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    className='bg-primary/5 p-8 rounded-2xl text-center space-y-4 border border-primary/20 h-full flex flex-col justify-center items-center py-12'
-                  >
-                    <CheckCircle className='w-12 h-12 text-primary' />
-                    <h4 className='font-headline font-bold text-xl text-on-surface'>Application Received</h4>
-                    <p className='text-xs text-on-surface-variant leading-relaxed font-body font-light max-w-sm'>
-                      Thank you for applying. Our membership concierge will review your travel history and contact you shortly.
-                    </p>
-                  </motion.div>
-                ) : (
-                  <form onSubmit={handleSubmit} className='space-y-6'>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                      <div className='space-y-2'>
-                        <label className='block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant'>Full Name</label>
-                        <input 
-                          type='text' 
-                          required 
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          className='w-full bg-surface-container-low border-0 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all text-sm font-body' 
-                          placeholder='Alex Sterling' 
-                        />
-                      </div>
-                      <div className='space-y-2'>
-                        <label className='block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant'>Email Address</label>
-                        <input 
-                          type='email' 
-                          required 
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className='w-full bg-surface-container-low border-0 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all text-sm font-body' 
-                          placeholder='alex@sterling.com' 
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className='space-y-2'>
-                      <label className='block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant'>Primary Travel Interest</label>
-                      <select 
-                        value={interest}
-                        onChange={(e) => setInterest(e.target.value)}
-                        className='w-full bg-surface-container-low border-0 rounded-xl py-3.5 px-4 focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all text-sm font-body'
-                      >
-                        <option>Urban Retreats & Culture</option>
-                        <option>Private Islands & Serenity</option>
-                        <option>Alpine Adventures</option>
-                        <option>Corporate Concierge</option>
-                      </select>
-                    </div>
-
-                    <div className='space-y-2'>
-                      <label className='block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant'>Message (Optional)</label>
-                      <textarea 
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        className='w-full bg-surface-container-low border-0 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all text-sm font-body' 
-                        placeholder='Tell us about your travel philosophy...' 
-                        rows={3}
-                      />
-                    </div>
-
-                    <button 
-                      type='submit' 
-                      className='w-full primary-gradient text-on-primary py-4 rounded-xl font-headline font-bold text-xs uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all duration-300'
-                    >
-                      Submit Application
-                    </button>
-                    
-                    <p className='text-[9px] text-center text-on-surface-variant uppercase tracking-widest mt-4 font-body'>
-                      Applications are reviewed on a rolling basis
-                    </p>
-                  </form>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-        </section>
+        <div id="join">
+          <InnerCircleSection />
+        </div>
       </main>
 
       <Footer />

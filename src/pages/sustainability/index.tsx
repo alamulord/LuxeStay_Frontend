@@ -70,7 +70,7 @@ export function Sustainability() {
 
         {/* ── BENTO COMMITMENT PILLARS ── */}
         <section className='py-24 px-6 bg-surface-container-lowest border-t border-b border-outline-variant/10'>
-          <div className='max-w-page mx-auto'>
+          <div className='max-w-page mx-auto mb-60'>
             <div className='grid grid-cols-1 md:grid-cols-12 gap-8 h-auto md:h-[800px]'>
               {/* Carbon Neutral (Pillar 1) */}
               <div className='md:col-span-8 group relative overflow-hidden rounded-2xl bg-surface-container-low p-10 flex flex-col justify-end border border-outline-variant/5 shadow-sm text-left'>
@@ -169,7 +169,7 @@ export function Sustainability() {
         </section>
 
         {/* ── CSO QUOTE SECTION ── */}
-        <section className='py-32 px-6 bg-surface'>
+        <section className='py-32 px-6 bg-surface mt-32'>
           <div className='max-w-page mx-auto flex flex-col lg:flex-row items-center gap-16'>
             <div className='flex-1 text-left space-y-8'>
               <h2 className='font-display text-4xl md:text-5xl font-bold leading-tight'>
