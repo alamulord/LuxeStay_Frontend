@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { formatCurrency } from '../../lib/utils';
 import { PremiumButton } from '../ui/PremiumButton';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface RoomBookingSidebarProps {
   roomId: string;
@@ -30,6 +31,15 @@ export const RoomBookingSidebar: React.FC<RoomBookingSidebarProps> = ({
   setGuests,
 }) => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  const handleReserve = () => {
+    if (!isAuthenticated) {
+      navigate(`/login?redirect=${encodeURIComponent(`/checkout/${roomId}`)}`);
+    } else {
+      navigate(`/checkout/${roomId}`);
+    }
+  };
 
   const nights =
     checkIn && checkOut
@@ -105,7 +115,7 @@ export const RoomBookingSidebar: React.FC<RoomBookingSidebarProps> = ({
         <>
           {/* Reserve Button */}
           <PremiumButton
-            onClick={() => navigate(`/checkout/${roomId}`)}
+            onClick={handleReserve}
             className="w-full py-4 text-xs tracking-wider uppercase font-bold"
           >
             Reserve Suite

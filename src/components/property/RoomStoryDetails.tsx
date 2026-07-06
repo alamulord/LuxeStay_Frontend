@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Sparkles, Compass, MapPin, Star, Bot, Send, ShieldCheck } from 'lucide-react';
 import { Room } from '../../types/room.types';
 import { GlassCard } from '../ui/GlassCard';
@@ -6,6 +7,8 @@ import { Badge } from '../ui/Badge';
 import { RoomVirtualTour } from './RoomVirtualTour';
 import { AIChatBubble } from '../ui/AIChatBubble';
 import { ThinkingIndicator } from '../ui/ThinkingIndicator';
+import { useAuth } from '../../contexts/AuthContext';
+import { useBookingStore } from '../../store/bookingStore';
 
 interface RoomStoryDetailsProps {
   room: Room;
@@ -24,6 +27,10 @@ export const RoomStoryDetails: React.FC<RoomStoryDetailsProps> = ({
   reviewsList,
   fromAi,
 }) => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const bookingStore = useBookingStore();
+
   const [askInput, setAskInput] = useState('');
   const [chatHistory, setChatHistory] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
   const [isAiLoading, setIsAiLoading] = useState(false);
@@ -35,21 +42,67 @@ export const RoomStoryDetails: React.FC<RoomStoryDetailsProps> = ({
     setIsAiLoading(true);
     const updatedHistory = [...chatHistory, { role: 'user' as const, content: askInput }];
     setChatHistory(updatedHistory);
+    const userInput = askInput;
     setAskInput('');
 
-    // Simulate concierge response matching room context
-    setTimeout(() => {
-      let reply = `Regarding "${room.title}", the suite is fully optimized for privacy. `;
-      if (askInput.toLowerCase().includes('beach') || askInput.toLowerCase().includes('ocean') || askInput.toLowerCase().includes('view')) {
-        reply += "Yes, the master suite features direct floor-to-ceiling glass paneling looking out to the sea. You can watch the sunrise directly from the king-sized bed.";
-      } else if (askInput.toLowerCase().includes('chef') || askInput.toLowerCase().includes('kitchen') || askInput.toLowerCase().includes('food')) {
-        reply += "A private chef is available upon request. The kitchen is stocked with local organic ingredients and custom glassware prior to your arrival.";
+    const text = userInput.toLowerCase();
+    const isBookingIntent = text.includes('book') || text.includes('reserve') || text.includes('check-in') || text.includes('check in') || text.includes('arrange early') || text.includes('tomorrow to friday') || text.includes('starting from') || text.includes('tommorrow');
+
+    if (isBookingIntent) {
+      // Calculate check-in: tomorrow
+      const checkInDate = new Date();
+      checkInDate.setDate(checkInDate.getDate() + 1);
+      const checkInStr = checkInDate.toISOString().split('T')[0];
+
+      // Calculate check-out: next Friday or 4 days later
+      let checkOutDate = new Date(checkInDate);
+      if (text.includes('friday')) {
+        const day = checkInDate.getDay();
+        const diff = (5 - day + 7) % 7 || 7;
+        checkOutDate.setDate(checkInDate.getDate() + diff);
       } else {
-        reply += "All details, including spatial layout and local concierge arrangements, have been inspected by our team to guarantee an exceptional stay. Let me know if you would like me to arrange early check-in.";
+        checkOutDate.setDate(checkInDate.getDate() + 4);
       }
-      setChatHistory([...updatedHistory, { role: 'assistant' as const, content: reply }]);
-      setIsAiLoading(false);
-    }, 1500);
+      const checkOutStr = checkOutDate.toISOString().split('T')[0];
+
+      // Save states
+      bookingStore.setCheckIn(checkInStr);
+      bookingStore.setCheckOut(checkOutStr);
+      bookingStore.setGuests(2);
+
+      setTimeout(() => {
+        let reply = "";
+        if (isAuthenticated) {
+          reply = `I would be delighted to arrange this for you. I have initialized your early check-in reservation from tomorrow (${checkInStr}) to Friday (${checkOutStr}) for 2 guests. I am now redirecting you to our secure checkout page to finalize your booking.`;
+          setChatHistory([...updatedHistory, { role: 'assistant' as const, content: reply }]);
+          setIsAiLoading(false);
+          setTimeout(() => {
+            navigate(`/checkout/${room.id}`);
+          }, 3000);
+        } else {
+          reply = `I would be delighted to arrange this for you. I have initialized your early check-in reservation from tomorrow (${checkInStr}) to Friday (${checkOutStr}) for 2 guests. To complete this operation, you need to log in to your account. I'm redirecting you to our secure login page now, and you will continue directly to checkout where you stopped once you sign in.`;
+          setChatHistory([...updatedHistory, { role: 'assistant' as const, content: reply }]);
+          setIsAiLoading(false);
+          setTimeout(() => {
+            navigate(`/login?redirect=${encodeURIComponent(`/checkout/${room.id}`)}`);
+          }, 5500);
+        }
+      }, 1500);
+    } else {
+      // Simulate concierge response matching room context
+      setTimeout(() => {
+        let reply = `Regarding "${room.title}", the suite is fully optimized for privacy. `;
+        if (text.includes('beach') || text.includes('ocean') || text.includes('view')) {
+          reply += "Yes, the master suite features direct floor-to-ceiling glass paneling looking out to the sea. You can watch the sunrise directly from the king-sized bed.";
+        } else if (text.includes('chef') || text.includes('kitchen') || text.includes('food')) {
+          reply += "A private chef is available upon request. The kitchen is stocked with local organic ingredients and custom glassware prior to your arrival.";
+        } else {
+          reply += "All details, including spatial layout and local concierge arrangements, have been inspected by our team to guarantee an exceptional stay. Let me know if you would like me to arrange early check-in.";
+        }
+        setChatHistory([...updatedHistory, { role: 'assistant' as const, content: reply }]);
+        setIsAiLoading(false);
+      }, 1500);
+    }
   };
 
   return (

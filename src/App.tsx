@@ -5,6 +5,7 @@ import { BookingProvider } from './contexts/BookingContext';
 import { ErrorBoundary } from './components/shared/ErrorBoundary';
 import { LoadingSpinner } from './components/shared/LoadingSpinner';
 import { ProtectedRoute } from './components/shared/ProtectedRoute';
+import { CookieConsent } from './components/shared/CookieConsent';
 
 const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
 const Search = lazy(() => import('./pages/Search').then(m => ({ default: m.Search })));
@@ -170,6 +171,7 @@ function App() {
                 {/* 404 Fallback Route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <CookieConsent />
             </Suspense>
           </BookingProvider>
         </AuthProvider>
