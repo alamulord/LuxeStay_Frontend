@@ -52,7 +52,7 @@ export function ImmersiveExperiences() {
       duration: '3 Hours', 
       capacity: 'VIP Access', 
       desc: 'Navigate the coastline on a bespoke 50ft yacht with vintage Bollinger champagne and personal elite crew.', 
-      image: 'https://images.unsplash.com/photo-1505080856163-267d49b302c4?w=800&auto=format&fit=crop&q=80' 
+      image: 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&auto=format&fit=crop&q=80' 
     },
     { 
       title: 'Midnight Gallery Tour', 

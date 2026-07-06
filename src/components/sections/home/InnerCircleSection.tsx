@@ -15,7 +15,7 @@ export const InnerCircleSection: React.FC = () => {
   };
 
   return (
-    <section className="max-w-page mx-auto px-6 lg:px-10 mb-24 no-print select-none">
+    <section className="max-w-page mx-auto px-6 py-32 lg:px-10 mb-24 no-print select-none">
       {/* Outer Floating Card Container */}
       <div className="bg-[#f5f5f5] rounded-[2.5rem] shadow-ambient overflow-hidden border border-outline-variant/10">
         <div className="grid grid-cols-1 lg:grid-cols-12">
