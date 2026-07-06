@@ -95,7 +95,7 @@ export function PropertyCard({
     >
       <div className="overflow-hidden">
         {/* Image Container */}
-        <div className="relative aspect-[4/3] rounded-xl overflow-hidden img-hover-zoom">
+        <div className="relative aspect-[4/3] rounded-xl overflow-hidden img-hover-zoom mb-3">
           <img
             src={room.images[0] || '/placeholder-room.jpg'}
             alt={room.title}

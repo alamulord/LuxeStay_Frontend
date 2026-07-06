@@ -22,6 +22,22 @@ export const FAQSection: React.FC = () => {
     {
       q: "Can I book private experiences only?",
       a: "While our experiences are primarily designed for our staying guests, members of the 'Inner Circle' can access our curated experience catalog independently."
+    },
+    {
+      q: "What amenities are included as standard?",
+      a: "All LuxeStay residences include premium high-speed Wi-Fi, organic cotton linens, signature bath amenities, a fully-stocked espresso bar, and 24/7 priority concierge support."
+    },
+    {
+      q: "What is your cancellation and modification policy?",
+      a: "We offer flexible reservation modifications up to 14 days prior to arrival. Cancellations made within 30 days are eligible for credit towards future stays, while members of the Inner Circle enjoy fee-free cancellations up to 72 hours in advance."
+    },
+    {
+      q: "Do you accommodate private flights and custom arrivals?",
+      a: "Yes, our elite concierge team regularly coordinates with private aviation terminals, superyacht docks, and local luxury transport providers to ensure seamless, private transit directly to your villa doorstep."
+    },
+    {
+      q: "How does the AI Concierge work during my stay?",
+      a: "The AI Concierge provides real-time curated recommendations for dining, custom itineraries, and home automation control, backed by local hosts who can fulfill physical requests instantly."
     }
   ];
 
