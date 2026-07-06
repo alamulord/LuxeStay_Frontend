@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Minus, Plus, Search, Star, Wifi, Waves, Flame, Compass, Tv, Coffee, ShieldCheck } from 'lucide-react';
 import { useFilterStore } from '../../store/filterStore';
+import api from '../../lib/api';
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -32,6 +33,9 @@ const amenitiesList = [
 export function FilterModal({ isOpen, onClose }: FilterModalProps) {
   const store = useFilterStore();
 
+  const [availableLocations, setAvailableLocations] = useState<{ city: string; country: string }[]>([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
   // Local state to hold filters before applying
   const [localLocation, setLocalLocation] = useState(store.location || '');
   const [localPriceMin, setLocalPriceMin] = useState<number | undefined>(store.priceMin);
@@ -52,6 +56,17 @@ export function FilterModal({ isOpen, onClose }: FilterModalProps) {
       setLocalAmenities(store.amenities || []);
       setLocalSortBy(store.sortBy);
       setLocalSortOrder(store.sortOrder || 'desc');
+
+      // Fetch dynamic locations
+      const fetchLocations = async () => {
+        try {
+          const res = await api.get('/rooms/locations');
+          setAvailableLocations(res.data);
+        } catch (err) {
+          console.error('Failed to load locations', err);
+        }
+      };
+      fetchLocations();
     }
   }, [isOpen, store]);
 
@@ -136,9 +151,56 @@ export function FilterModal({ isOpen, onClose }: FilterModalProps) {
                 type="text"
                 placeholder="Search destination cities or countries..."
                 value={localLocation}
-                onChange={(e) => setLocalLocation(e.target.value)}
+                onChange={(e) => {
+                  setLocalLocation(e.target.value);
+                  setDropdownOpen(true);
+                }}
+                onFocus={() => setDropdownOpen(true)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-full border border-outline-variant/35 text-sm focus:outline-none focus:border-[#ba0036] transition-colors"
               />
+
+              {/* Dropdown list */}
+              {dropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setDropdownOpen(false)} />
+                  <div className="absolute left-0 right-0 mt-2 bg-white border border-outline-variant/10 rounded-2xl shadow-xl z-40 max-h-56 overflow-y-auto divide-y divide-outline-variant/5">
+                    {(() => {
+                      const filtered = availableLocations.filter(loc => 
+                        loc.city.toLowerCase().includes(localLocation.toLowerCase()) ||
+                        loc.country.toLowerCase().includes(localLocation.toLowerCase())
+                      );
+
+                      if (filtered.length === 0) {
+                        return (
+                          <div className="px-4 py-3 text-xs text-on-surface-variant italic text-left">
+                            No matching locations found
+                          </div>
+                        );
+                      }
+
+                      return filtered.map((loc) => (
+                        <button
+                          key={`${loc.city}-${loc.country}`}
+                          type="button"
+                          onClick={() => {
+                            setLocalLocation(loc.city);
+                            setDropdownOpen(false);
+                          }}
+                          className="w-full px-4 py-3 text-left text-xs text-on-surface hover:bg-surface-container-low transition-colors flex items-center justify-between"
+                        >
+                          <div className="text-left">
+                            <span className="font-bold text-[#1a1c1c]">{loc.city}</span>
+                            <span className="text-on-surface-variant ml-1">, {loc.country}</span>
+                          </div>
+                          <span className="text-[10px] uppercase tracking-wider text-[#ba0036] font-bold opacity-70">
+                            Select
+                          </span>
+                        </button>
+                      ));
+                    })()}
+                  </div>
+                </>
+              )}
             </div>
             
             {/* Quick Cities Grid */}
