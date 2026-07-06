@@ -86,6 +86,16 @@ export function Home() {
 
   const [activeCategory, setActiveCategory] = useState('all');
 
+  const handleSelectCategory = (id: string) => {
+    setActiveCategory(id);
+    setTimeout(() => {
+      const el = document.getElementById('trending-stays');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  };
+
   const handleAISearch = (prompt: string) => {
     navigate(`/search?ai_prompt=${encodeURIComponent(prompt)}`);
   };
@@ -102,7 +112,7 @@ export function Home() {
         <CategoryTabs
           categories={categories}
           activeCategory={activeCategory}
-          onSelectCategory={setActiveCategory}
+          onSelectCategory={handleSelectCategory}
         />
 
         {/* Curated Destinations */}

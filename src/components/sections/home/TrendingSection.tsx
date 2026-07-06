@@ -54,7 +54,7 @@ export const TrendingSection: React.FC<TrendingSectionProps> = ({ rooms = [], is
   }, [rooms, category]);
 
   return (
-    <section className="max-w-page mx-auto px-6 lg:px-10 py-8 mb-16 no-print">
+    <section id="trending-stays" className="max-w-page mx-auto px-6 lg:px-10 py-8 mb-16 no-print scroll-mt-28">
       <SectionHeading
         title="Trending Stays"
         subtitle="Our guests are currently escaping to these extraordinary homes."
@@ -80,10 +80,10 @@ export const TrendingSection: React.FC<TrendingSectionProps> = ({ rooms = [], is
         </div>
       ) : (
         <motion.div
+          key={category}
           variants={staggerContainer}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          animate="visible"
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           {filteredRooms.slice(0, 6).map((room) => (

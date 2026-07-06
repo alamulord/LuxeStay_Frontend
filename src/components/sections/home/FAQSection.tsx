@@ -38,6 +38,10 @@ export const FAQSection: React.FC = () => {
     {
       q: "How does the AI Concierge work during my stay?",
       a: "The AI Concierge provides real-time curated recommendations for dining, custom itineraries, and home automation control, backed by local hosts who can fulfill physical requests instantly."
+    },
+    {
+      q: "How does the keyless entry and home automation work?",
+      a: "Every LuxeStay is equipped with a secured smart lock and an integrated climate and lighting system that adapts to your preset preferences prior to check-in."
     }
   ];
 

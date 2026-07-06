@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Key, Star, Users, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Key, Star, Users, CheckCircle, Compass, Shield, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Navbar } from '../../components/shared/Navbar';
 import { Footer } from '../../components/shared/Footer';
 
 export function InnerCircle() {
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [interest, setInterest] = useState('Urban Retreats & Culture');
+  const [message, setMessage] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -13,143 +18,285 @@ export function InnerCircle() {
   };
 
   return (
-    <div className='min-h-screen bg-surface flex flex-col justify-between text-on-surface font-body'>
+    <div className='min-h-screen bg-surface flex flex-col justify-between text-on-surface font-body select-none'>
       <Navbar />
 
       <main className='pt-[72px] flex-grow'>
-        {/* Inner Circle Hero */}
+        {/* ── HERO SECTION ── */}
         <section className='relative h-[85vh] flex items-center overflow-hidden px-6 lg:px-16'>
           <div className='absolute inset-0 z-0'>
-            <img
-              alt='Penthouse pool sunset'
-              className='w-full h-full object-cover'
-              src='https://lh3.googleusercontent.com/aida-public/AB6AXuAnepRwCnSh0jUdI32DW2ilvAZGvcMxkjxFiJ5jWzm_toAUUmcljpqCHl96Dl_tNeclc6iBScfXAQxLrs7K8jUnWhGRFUWxK2-Wm44wxeWRTXOD4weirZOK4oMRpP8YUS8KHq_aB8sXS0xk-YpzZBsTEcS19TIlJ_w_igQrcENkCo1Wl-cBGy4rnTtZidaU7yiskgMs8KmBIxijPqwxUmcd1VZkLkJuc3twdGwIQ-Bhub5I7IPG0hc6BvVovWdeKt0Ix87vv4XHQ7S0'
+            <motion.div 
+              initial={{ scale: 1.05 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 12, ease: 'easeOut' }}
+              className='w-full h-full bg-cover bg-center'
+              style={{ 
+                backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuCPgmYV5AZYrMKyZiG4UuxYTze7-7aWDxLe0R0WPwQ2UbxIOBCU2Uzv4EQkdNuPDdOJ5Y3ja9G2s1B2kgrcR4uPsmXMvBQFGXsvuIxTL3nOOxXdRPsF9VaXcW-hPqGfIMYfXxdLEvGOK2bkFz6G_xJpxUy4kDapSq8bLMufQKTQ7KtIV3x2mGTUzayxjrJrWBn98thVtRgbi4auLBqu6cUoJsRiWUv5sPOQjiaJlaaexVRgnxMD2N9l6nJkdI8o4BugFrIZd6401lVt')` 
+              }}
             />
-            <div className='absolute inset-0 bg-gradient-to-r from-black/70 to-black/30' />
+            <div className='absolute inset-0 bg-gradient-to-r from-surface via-surface/65 to-transparent' />
           </div>
-          <div className='relative z-10 max-w-4xl space-y-6 text-white'>
+          
+          <div className='relative z-10 max-w-4xl space-y-6'>
             <Link
               to='/'
-              className='inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary-fixed-dim hover:underline mb-4 text-white'
+              className='inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary-fixed-dim hover:text-primary transition-colors mb-4'
             >
               <ArrowLeft className='w-3.5 h-3.5' /> Back to Home
             </Link>
-            <span className='inline-block px-4 py-1.5 rounded-full bg-white/20 text-white text-xs font-bold uppercase tracking-widest border border-white/20 backdrop-blur-sm'>
-              The Sovereign Experience
-            </span>
-            <h1 className='font-display text-5xl md:text-8xl font-black tracking-tight leading-none'>
-              Welcome to the <br />
-              <span className='text-primary-fixed-dim'>Inner Circle.</span>
-            </h1>
-            <p className='text-lg text-white/80 max-w-xl leading-relaxed'>
-              A limited invitation to a world of heightened hospitality. Beyond the reservation, we curate the extraordinary for our most discerning guests.
-            </p>
-            <div className='flex gap-4 pt-4'>
-              <a href="#apply" className='bg-primary text-white px-8 py-4 rounded-xl font-bold hover:scale-105 transition-all shadow-lg shadow-primary/20'>
+            
+            <div className='space-y-4'>
+              <span className='inline-block py-1 px-4 rounded-full bg-secondary-fixed text-on-secondary-fixed font-headline text-[10px] font-bold tracking-widest uppercase'>
+                The Sovereign Experience
+              </span>
+              
+              <h1 className='font-display text-5xl md:text-7xl font-extrabold text-on-surface leading-[0.9] tracking-tighter'>
+                Welcome to the <br />
+                <span className='text-primary'>Inner Circle.</span>
+              </h1>
+              
+              <p className='font-body text-lg md:text-xl text-on-surface-variant max-w-xl leading-relaxed font-light'>
+                A limited invitation to a world of heightened hospitality. Beyond the reservation, we curate the extraordinary for our most discerning guests.
+              </p>
+            </div>
+            
+            <div className='flex flex-wrap gap-4 pt-4'>
+              <a 
+                href="#join" 
+                className='px-8 py-4 rounded-xl bg-primary text-white font-headline font-bold text-xs uppercase tracking-wider shadow-lg hover:scale-103 active:scale-95 transition-all duration-300 btn-primary-gradient'
+              >
                 Request Invitation
               </a>
-              <a href="#benefits" className='bg-white/10 text-white border border-white/20 backdrop-blur-sm px-8 py-4 rounded-xl font-bold hover:bg-white/20 transition-all'>
+              <a 
+                href="#benefits" 
+                className='px-8 py-4 rounded-xl bg-surface-container-lowest text-on-surface border border-outline-variant/15 font-headline font-bold text-xs uppercase tracking-wider hover:bg-surface-container-high transition-all duration-300'
+              >
                 Explore Benefits
               </a>
             </div>
           </div>
         </section>
 
-        {/* Benefits Grid */}
-        <section className='py-24 px-6 max-w-6xl mx-auto' id='benefits'>
-          <div className='text-center max-w-2xl mx-auto mb-16 space-y-4'>
-            <h2 className='font-display text-3xl md:text-4xl font-bold'>The Privilege of Access</h2>
-            <p className='text-on-surface-variant text-sm leading-relaxed'>
-              Membership is more than a status; it is a key to a global network of silent luxury, bespoke services, and moments designed specifically for your preference profile.
-            </p>
+        {/* ── BENTO BENEFITS SECTION ── */}
+        <section className='py-24 max-w-page mx-auto px-6 lg:px-10 border-t border-outline-variant/10' id='benefits'>
+          <div className='flex flex-col md:flex-row justify-between items-end mb-16 gap-8'>
+            <div className='max-w-2xl text-left'>
+              <span className='text-xs font-bold uppercase tracking-widest text-primary'>Privileged Access</span>
+              <h2 className='font-headline text-3xl md:text-4xl font-extrabold mt-2'>The Privilege of Access</h2>
+              <p className='font-body text-sm text-on-surface-variant mt-4 leading-relaxed font-light'>
+                Membership is more than a status; it is a key to a global network of silent luxury, bespoke services, and moments designed specifically for your preference profile.
+              </p>
+            </div>
+            <div className='flex items-center gap-4 border-b border-primary/20 pb-2 shrink-0 font-headline font-bold text-xs tracking-widest text-primary'>
+              <span>01 / 03</span>
+            </div>
           </div>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-            <div className='bg-surface-container-low p-8 rounded-2xl border border-outline-variant/10 shadow-sm flex items-start gap-4'>
-              <Key className='w-8 h-8 text-primary shrink-0' />
-              <div>
-                <h4 className='font-headline font-bold text-lg mb-2'>Member-Only Rates</h4>
-                <p className='text-on-surface-variant text-xs leading-relaxed'>
+          <div className='grid grid-cols-1 md:grid-cols-12 gap-8'>
+            {/* Member-Only Rates */}
+            <div className='md:col-span-8 group relative overflow-hidden rounded-2xl bg-surface-container-low min-h-[350px] md:min-h-auto shadow-sm border border-outline-variant/5 flex flex-col justify-end p-8'>
+              <div 
+                className='absolute inset-0 z-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-103'
+                style={{ 
+                  backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuDWKr28Y7xK-YIiiRcVv5s6BkaFEAVElpJsPkk8w_iF80IfS2lTx2VoMKbgjUl0ZuhJLJcKVYmBSwAmK1l7YPd_F14o5CNLg-d4n9UdjxuelK7Nk-p4wy1NciMi2UjpTaQ0LfF-Fcxs37YiCU7jEx7-mN2L9JONKu4RjdhwM1BCNldsGM0BrncPDdxGm549vYWMeHFBYB03m7hjWrbt-xaJNrKsiEsnspOTlieHYHn4whguuqYjzSztNK5kPZzWOposZvaEUxVxAu0h')` 
+                }}
+              />
+              <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 transition-colors z-0' />
+              
+              <div className='relative z-10 text-white space-y-2 max-w-md text-left'>
+                <h3 className='font-headline text-2xl font-bold tracking-tight'>Member-Only Rates</h3>
+                <p className='text-xs text-white/80 leading-relaxed font-body font-light'>
                   Exclusive pricing across our entire global collection, including early access to seasonal suites and private villa launches.
                 </p>
               </div>
             </div>
-            <div className='bg-surface-container-low p-8 rounded-2xl border border-outline-variant/10 shadow-sm flex items-start gap-4'>
-              <Star className='w-8 h-8 text-primary shrink-0' />
-              <div>
-                <h4 className='font-headline font-bold text-lg mb-2'>Bespoke Concierge</h4>
-                <p className='text-on-surface-variant text-xs leading-relaxed'>
-                  Your personal travel curator. From securing a table at a fully booked Michelin-starred restaurant to organizing private jet transfers.
+
+            {/* Bespoke Concierge */}
+            <div className='md:col-span-4 group relative overflow-hidden rounded-2xl bg-secondary text-white p-8 flex flex-col justify-between min-h-[350px] shadow-sm border border-outline-variant/5 text-left'>
+              <div className='w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border border-white/10'>
+                <Key className='w-5 h-5 text-white' />
+              </div>
+              <div className='space-y-3'>
+                <h3 className='font-headline text-2xl font-bold tracking-tight'>Bespoke Concierge</h3>
+                <p className='text-xs text-white/80 leading-relaxed font-body font-light'>
+                  Your personal architectural and travel curator. From securing a table at a fully booked Michelin-starred restaurant to organizing private jet transfers.
                 </p>
               </div>
             </div>
-            <div className='bg-surface-container-low p-8 rounded-2xl border border-outline-variant/10 shadow-sm flex items-start gap-4'>
-              <Users className='w-8 h-8 text-primary shrink-0' />
-              <div>
-                <h4 className='font-headline font-bold text-lg mb-2'>Private Events</h4>
-                <p className='text-on-surface-variant text-xs leading-relaxed'>
+
+            {/* Private Events */}
+            <div className='md:col-span-4 group relative overflow-hidden rounded-2xl bg-surface-container-low p-8 flex flex-col justify-between min-h-[350px] shadow-sm border border-outline-variant/5 text-left'>
+              <div className='space-y-3'>
+                <span className='font-headline text-primary text-[9px] font-bold tracking-widest uppercase block'>
+                  Seasonal Gatherings
+                </span>
+                <h3 className='font-headline text-2xl font-bold tracking-tight text-on-surface'>Private Events</h3>
+                <p className='text-xs text-on-surface-variant leading-relaxed font-body font-light'>
                   Invitations to gallery openings, vineyard harvests, and intimate rooftop galas exclusive to our circle.
                 </p>
               </div>
+              <div className='mt-6'>
+                <div 
+                  className='w-full h-32 rounded-xl bg-cover bg-center grayscale hover:grayscale-0 transition-all duration-700'
+                  style={{ 
+                    backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuDFmbAy9poT2ES8djFVB6nj1G8mO9U29cmEnaRbcDmx4lkRTy9tHZUzGxyja3QeXtWaqmTQb0t5HdaQCCenU13-slRfRifBrUIa6eingYfv4uNllFIOPuLWgsH8zeGRwEQqqyuKCWqQ83sNrsQAQ0C9FnFqCG1CsmQGHHau9LxzECGp0VIOtwKQf61n3Yc9kULNVHsS6WLU7n7abDTYSChU2jykDiBdrg4EeZJcuk-xNTzUSMDB_2RD6rIvEKUceqwb_SFiP9gioNxc')` 
+                  }}
+                />
+              </div>
             </div>
-            <div className='bg-surface-container-low p-8 rounded-2xl border border-outline-variant/10 shadow-sm flex items-start gap-4'>
-              <CheckCircle className='w-8 h-8 text-primary shrink-0' />
-              <div>
-                <h4 className='font-headline font-bold text-lg mb-2'>Universal Recognition</h4>
-                <p className='text-on-surface-variant text-xs leading-relaxed'>
-                  Wherever you land, you are known. Late check-outs, room upgrades, and personalized welcome amenities are our standard.
-                </p>
+
+            {/* Global Recognition */}
+            <div className='md:col-span-8 group relative overflow-hidden rounded-2xl bg-surface-container-low shadow-sm border border-outline-variant/5'>
+              <div className='flex flex-col md:flex-row h-full min-h-[350px] md:min-h-auto'>
+                <div className='md:w-1/2 p-8 flex flex-col justify-center text-left space-y-4'>
+                  <h3 className='font-headline text-2xl font-bold tracking-tight text-on-surface'>Universal Recognition</h3>
+                  <p className='text-xs text-on-surface-variant leading-relaxed font-body font-light'>
+                    Wherever you land, you are known. Late check-outs, room upgrades, and personalized welcome amenities are our standard for members.
+                  </p>
+                  <a className='inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:gap-2 transition-all duration-300' href='#'>
+                    <span>Learn more about tiers</span>
+                    <ArrowRight className='w-3.5 h-3.5' />
+                  </a>
+                </div>
+                <div 
+                  className='md:w-1/2 h-48 md:h-auto bg-cover bg-center'
+                  style={{ 
+                    backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuBiS0GxWUMhJ-gxiyny2CjnnQTyuo8gC7YnKK-PSiAJjkuazH_sWtS3dyFvNIloN5XCvLJCBD-3MSqJq_70kCqfzsiqlxCYp_LmDPPXOPO8BtiVmDPBCMI3kN5PMGhEFvJ814uTcwtsIRHlDd4PClrBslW0Cl3XNMaXH9fZOkugFA0e2Jta3xIghrM91MaLZpG2Kvya3pnqs_iRi8NVMQMr-JUtRG3DeDSTjNpu3JrDwJ7EKaPUTOhyretiyUwWUutd-P1QEQ5Wpiac')` 
+                  }}
+                />
               </div>
             </div>
           </div>
         </section>
 
-        {/* Application Form */}
-        <section className='py-24 px-6 bg-surface-container-low border-t border-outline-variant/15' id='apply'>
-          <div className='max-w-4xl mx-auto bg-surface-container-lowest rounded-3xl p-8 lg:p-12 border border-outline-variant/10 shadow-2xl flex flex-col md:flex-row gap-12'>
-            <div className='md:w-1/2 flex flex-col justify-center space-y-6'>
-              <h2 className='font-display text-3xl md:text-5xl font-bold'>Apply for <br /><span className='text-primary'>Membership</span></h2>
-              <p className='text-on-surface-variant text-xs leading-relaxed'>
+        {/* ── QUOTE / ATMOSPHERE ── */}
+        <section className='py-28 bg-surface-container-lowest overflow-hidden border-t border-b border-outline-variant/10 relative'>
+          <div className='absolute -top-16 left-6 text-[18rem] font-display font-black text-on-surface/5 select-none leading-none pointer-events-none'>
+            “
+          </div>
+          <div className='relative z-10 flex flex-col items-center text-center px-6'>
+            <blockquote className='font-display text-2xl md:text-4xl font-light italic text-on-surface max-w-4xl leading-snug mb-8'>
+              "LuxeStay doesn't just provide a room; they provide a sense of belonging in the most beautiful corners of the world."
+            </blockquote>
+            <cite className='font-headline text-[10px] font-bold tracking-widest uppercase text-primary not-italic'>
+              — Julianna V., Platinum Member since 2019
+            </cite>
+          </div>
+        </section>
+
+        {/* ── LEAD CAPTURE FORM ── */}
+        <section className='py-24 max-w-page mx-auto px-6 lg:px-10' id='join'>
+          <div className='bg-surface-container-low shadow-ambient rounded-[2rem] overflow-hidden flex flex-col md:flex-row border border-outline-variant/10'>
+            <div className='md:w-1/2 p-10 md:p-16 flex flex-col justify-center text-left space-y-6'>
+              <h2 className='font-headline text-4xl md:text-5xl font-extrabold text-on-surface leading-[1.1]'>
+                Apply for <br />
+                <span className='text-primary'>Membership</span>
+              </h2>
+              <p className='font-body text-sm text-on-surface-variant leading-relaxed font-light'>
                 The Inner Circle is currently by invitation or application. Please provide your details below, and our membership concierge will contact you within 48 hours to discuss your preferences.
               </p>
-              <div className='flex items-center gap-2 text-xs font-semibold text-on-surface-variant'>
-                <strong className='text-primary'>4,000+</strong> members worldwide
+              
+              <div className='flex items-center gap-4 pt-2'>
+                <div className='flex -space-x-3'>
+                  <div 
+                    className='w-10 h-10 rounded-full border-2 border-white bg-slate-300 bg-cover bg-center'
+                    style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuAC4uN0zQI4UyR2Uzngqsr1Z6kVZ9MUZ5M-FOcN-_E07UiXlXwQTo43kZWPCVt16OW02vlkQ8Cxvv8oREIN4Kx1dlILjZZ9UBV6phZtoyzUOzO121EoWfhJpmwp9SRjq7VDw8_vsXgqSTuR_1x5X1HagsxLAHkFxG8Hn506iEvQeSIOeuUN95hivnVtAASFJzMHhr3s_5cnhdifBmXMawXYGZonCU5qxsQwR2RBmz8-X4plrRDpNcjt0y6ItPP6Si1s7lSVI8uTUdRu')` }}
+                  />
+                  <div 
+                    className='w-10 h-10 rounded-full border-2 border-white bg-slate-400 bg-cover bg-center'
+                    style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuD3mnYp_SQOAHdcO9HRgVcCevmPPosCWmicLGBxrEQe_mMjKMUgvT4U5SH59_3GqE5YoNv1CBLrUv0Cv9zf0rJ0jvg3qp4zgvS1GttBA8z6l1QTD1wkvwfjWyasyJ5D4r8IRXtIuqdnr5m3FZsLkucrr1uO1w6Fk1vZyMqwvIOTxOPBEjEnlfC-wUpqyPL1g0XJ3G-Pvojs8OPmolU8M-4We29p4ot0S8XjRiA7zHHeCbzXqwPzm15O4oG5EJv8soWseHeQRZc3jHB8')` }}
+                  />
+                  <div 
+                    className='w-10 h-10 rounded-full border-2 border-white bg-slate-500 bg-cover bg-center'
+                    style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuCQMASd5L92SE0oYJBEu71CzuZNeNzwGNRmoZ9c4KPYFWErBb5_pV3NRbbhF5euYfJPNzh25Mu5w_Sdum8ABTecwA1pPrT-_4AnAq9vl1Equh2AHO0LB9h10OmObd0A9j7ej5NCvKFq_E5Kr39SHgbObG264bylQQxiUgJXezAdKvJfnPkcgLNOBXEPunYkcbl_9Fp7muDbszjRGFCA7jcRvdsU9ueQh7Cqt7NjTnRLCn_JvunYwwds464g4MVLKp9f0szRBcYnR4lP')` }}
+                  />
+                </div>
+                <p className='text-xs font-headline font-bold uppercase tracking-wider text-on-surface-variant'>
+                  <span className='text-on-surface font-extrabold'>4,000+</span> members worldwide
+                </p>
               </div>
             </div>
             
-            <div className='md:w-1/2'>
-              {formSubmitted ? (
-                <div className='bg-primary/5 p-8 rounded-2xl text-center space-y-4 border border-primary/20'>
-                  <CheckCircle className='w-12 h-12 text-primary mx-auto' />
-                  <h4 className='font-headline font-bold text-xl'>Application Received</h4>
-                  <p className='text-xs text-on-surface-variant leading-relaxed'>
-                    Thank you for applying. Our membership concierge will review your travel history and contact you shortly.
-                  </p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className='space-y-6'>
-                  <div>
-                    <label className='block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant mb-2'>Full Name</label>
-                    <input type='text' required className='w-full bg-surface-container-low border-0 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all' placeholder='Alex Sterling' />
-                  </div>
-                  <div>
-                    <label className='block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant mb-2'>Email Address</label>
-                    <input type='email' required className='w-full bg-surface-container-low border-0 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all' placeholder='alex@sterling.com' />
-                  </div>
-                  <div>
-                    <label className='block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant mb-2'>Primary Travel Interest</label>
-                    <select className='w-full bg-surface-container-low border-0 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all'>
-                      <option>Urban Retreats & Culture</option>
-                      <option>Private Islands & Serenity</option>
-                      <option>Alpine Adventures</option>
-                      <option>Corporate Concierge</option>
-                    </select>
-                  </div>
-                  <button type='submit' className='w-full bg-primary text-white py-4 rounded-xl font-bold hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md shadow-primary/10'>
-                    Submit Application
-                  </button>
-                </form>
-              )}
+            <div className='md:w-1/2 bg-white p-10 md:p-16 border-l border-outline-variant/10 text-left'>
+              <AnimatePresence mode='wait'>
+                {formSubmitted ? (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    className='bg-primary/5 p-8 rounded-2xl text-center space-y-4 border border-primary/20 h-full flex flex-col justify-center items-center py-12'
+                  >
+                    <CheckCircle className='w-12 h-12 text-primary' />
+                    <h4 className='font-headline font-bold text-xl text-on-surface'>Application Received</h4>
+                    <p className='text-xs text-on-surface-variant leading-relaxed font-body font-light max-w-sm'>
+                      Thank you for applying. Our membership concierge will review your travel history and contact you shortly.
+                    </p>
+                  </motion.div>
+                ) : (
+                  <form onSubmit={handleSubmit} className='space-y-6'>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                      <div className='space-y-2'>
+                        <label className='block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant'>Full Name</label>
+                        <input 
+                          type='text' 
+                          required 
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className='w-full bg-surface-container-low border-0 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all text-sm font-body' 
+                          placeholder='Alex Sterling' 
+                        />
+                      </div>
+                      <div className='space-y-2'>
+                        <label className='block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant'>Email Address</label>
+                        <input 
+                          type='email' 
+                          required 
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className='w-full bg-surface-container-low border-0 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all text-sm font-body' 
+                          placeholder='alex@sterling.com' 
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className='space-y-2'>
+                      <label className='block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant'>Primary Travel Interest</label>
+                      <select 
+                        value={interest}
+                        onChange={(e) => setInterest(e.target.value)}
+                        className='w-full bg-surface-container-low border-0 rounded-xl py-3.5 px-4 focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all text-sm font-body'
+                      >
+                        <option>Urban Retreats & Culture</option>
+                        <option>Private Islands & Serenity</option>
+                        <option>Alpine Adventures</option>
+                        <option>Corporate Concierge</option>
+                      </select>
+                    </div>
+
+                    <div className='space-y-2'>
+                      <label className='block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant'>Message (Optional)</label>
+                      <textarea 
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        className='w-full bg-surface-container-low border-0 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all text-sm font-body' 
+                        placeholder='Tell us about your travel philosophy...' 
+                        rows={3}
+                      />
+                    </div>
+
+                    <button 
+                      type='submit' 
+                      className='w-full primary-gradient text-on-primary py-4 rounded-xl font-headline font-bold text-xs uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all duration-300'
+                    >
+                      Submit Application
+                    </button>
+                    
+                    <p className='text-[9px] text-center text-on-surface-variant uppercase tracking-widest mt-4 font-body'>
+                      Applications are reviewed on a rolling basis
+                    </p>
+                  </form>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </section>
