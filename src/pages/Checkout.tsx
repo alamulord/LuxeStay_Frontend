@@ -282,6 +282,7 @@ export function Checkout() {
         <CheckoutPaymentModal
           isOpen={showCardModal}
           onClose={() => setShowCardModal(false)}
+          paymentMethod={paymentMethod}
           cardNumber={cardNumber}
           setCardNumber={setCardNumber}
           cardExpiry={cardExpiry}

@@ -61,7 +61,9 @@ export function Confirmation() {
 
   return (
     <div className="min-h-screen bg-surface">
-      <Navbar />
+      <div className="print:hidden">
+        <Navbar />
+      </div>
 
       <main className="pt-[72px]">
         <div className="max-w-page mx-auto px-6 lg:px-10 py-12">
@@ -148,12 +150,11 @@ export function Confirmation() {
             </div>
           </motion.div>
 
-          {/* ══════ ACTIONS ══════ */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...transitionDefault, delay: 0.25 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-12 print:hidden"
           >
             <Link
               to="/dashboard/trips"
@@ -161,7 +162,10 @@ export function Confirmation() {
             >
               Manage Trip
             </Link>
-            <button className="px-8 py-3.5 rounded-full border border-[#1a1c1c] text-sm font-semibold text-[#1a1c1c] hover:bg-[#1a1c1c] hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
+            <button 
+              onClick={() => window.print()}
+              className="px-8 py-3.5 rounded-full border border-[#1a1c1c] text-sm font-semibold text-[#1a1c1c] hover:bg-[#1a1c1c] hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
+            >
               <Download className="w-4 h-4" />
               Print Receipt
             </button>
@@ -172,7 +176,7 @@ export function Confirmation() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...transitionDefault, delay: 0.3 }}
-            className="bg-surface-container-lowest rounded-xl shadow-ambient p-6 flex items-center gap-4 mb-12"
+            className="bg-surface-container-lowest rounded-xl shadow-ambient p-6 flex items-center gap-4 mb-12 print:hidden"
           >
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
               <Headphones className="w-6 h-6 text-primary" />
@@ -190,6 +194,7 @@ export function Confirmation() {
 
           {/* ══════ PREPARE FOR YOUR STAY ══════ */}
           <motion.div
+            className="print:hidden"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...transitionDefault, delay: 0.35 }}
@@ -210,7 +215,9 @@ export function Confirmation() {
         </div>
       </main>
 
-      <Footer />
+      <div className="print:hidden">
+        <Footer />
+      </div>
     </div>
   );
 }
