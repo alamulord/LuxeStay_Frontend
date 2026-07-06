@@ -38,13 +38,6 @@ export function InnerCircle() {
           </div>
           
           <div className='relative z-10 max-w-4xl space-y-6'>
-            <Link
-              to='/'
-              className='inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary-fixed-dim hover:text-primary transition-colors mb-4'
-            >
-              <ArrowLeft className='w-3.5 h-3.5' /> Back to Home
-            </Link>
-            
             <div className='space-y-4'>
               <span className='inline-block py-1 px-4 rounded-full bg-secondary-fixed text-on-secondary-fixed font-headline text-[10px] font-bold tracking-widest uppercase'>
                 The Sovereign Experience

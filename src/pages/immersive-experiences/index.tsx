@@ -124,12 +124,6 @@ export function ImmersiveExperiences() {
             <div className='absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-transparent' />
           </div>
           <div className='relative z-10 max-w-4xl space-y-6 text-white'>
-            <Link
-              to='/'
-              className='inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary-fixed-dim hover:text-white transition-colors mb-4'
-            >
-              <ArrowLeft className='w-3.5 h-3.5' /> Back to Home
-            </Link>
             <span className='inline-block px-4 py-1.5 rounded-full bg-white/20 text-white text-xs font-bold uppercase tracking-widest border border-white/20 backdrop-blur-sm'>
               The Editorial Collection
             </span>

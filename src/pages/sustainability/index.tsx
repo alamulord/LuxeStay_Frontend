@@ -23,13 +23,6 @@ export function Sustainability() {
         <section className='relative h-[85vh] flex items-center px-6 lg:px-16 overflow-hidden bg-surface-container-low text-left'>
           <div className='max-w-7xl mx-auto w-full grid md:grid-cols-2 items-center gap-16 relative z-10'>
             <div className='space-y-8'>
-              <Link
-                to='/'
-                className='inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary hover:underline mb-4'
-              >
-                <ArrowLeft className='w-3.5 h-3.5' /> Back to Home
-              </Link>
-              
               <div className='space-y-4'>
                 <span className='inline-block px-4 py-1.5 rounded-full bg-tertiary-container/10 text-tertiary font-headline text-[10px] font-bold tracking-widest uppercase'>
                   The Digital Concierge Presents

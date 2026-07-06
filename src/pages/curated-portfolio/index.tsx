@@ -21,13 +21,6 @@ export function CuratedPortfolio() {
           </div>
           
           <div className='relative z-10 max-w-4xl space-y-6 text-white'>
-            <Link
-              to='/'
-              className='inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#ffb2b6] hover:underline mb-4'
-            >
-              <ArrowLeft className='w-3.5 h-3.5' /> Back to Home
-            </Link>
-            
             <div className='space-y-4'>
               <span className='inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary-fixed-dim font-headline text-[10px] font-bold uppercase tracking-widest border border-primary/25 backdrop-blur-sm'>
                 The Collection 2024
