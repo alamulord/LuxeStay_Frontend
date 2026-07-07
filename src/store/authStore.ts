@@ -56,7 +56,9 @@ export const useAuthStore = create<AuthState>()(
       },
 
       fetchProfile: async () => {
-        set({ isLoading: true });
+        if (!get().user) {
+          set({ isLoading: true });
+        }
         try {
           const response = await api.get<User>('/auth/profile');
           set({ user: response.data, isAuthenticated: true, isLoading: false });

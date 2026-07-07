@@ -88,7 +88,7 @@ export function Footer() {
           <div className="flex items-center gap-6">
             <Link to="/privacy" className="text-xs text-on-surface-variant hover:text-on-surface transition-colors underline font-body">Privacy</Link>
             <Link to="/terms" className="text-xs text-on-surface-variant hover:text-on-surface transition-colors underline font-body">Terms</Link>
-            <Link to="/about" className="text-xs text-on-surface-variant hover:text-on-surface transition-colors underline font-body">Sitemap</Link>
+            <Link to="/sitemap" className="text-xs text-on-surface-variant hover:text-on-surface transition-colors underline font-body">Sitemap</Link>
           </div>
           <div className="flex items-center gap-4 text-xs text-on-surface-variant font-body">
             <button className="flex items-center gap-1.5 hover:text-on-surface transition-colors">

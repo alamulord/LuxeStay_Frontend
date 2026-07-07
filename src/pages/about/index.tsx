@@ -1,13 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../../components/shared/Navbar';
 import { Footer } from '../../components/shared/Footer';
 import { motion } from 'framer-motion';
 import { Shield, Compass, UserCheck, Star, Heart } from 'lucide-react';
 import { fadeIn } from '../../lib/animations';
+import api from '../../lib/api';
 
 export function About() {
   const navigate = useNavigate();
+  const [cmsContent, setCmsContent] = useState<{ title: string; content: string } | null>(null);
+
+  useEffect(() => {
+    const fetchCms = async () => {
+      try {
+        const response = await api.get<{ title: string; content: string; isActive: boolean }>('/cms/slug/about');
+        if (response.data && response.data.content && response.data.isActive) {
+          setCmsContent(response.data);
+        }
+      } catch (e) {
+        // fallback
+      }
+    };
+    fetchCms();
+  }, []);
 
   return (
     <div className='min-h-screen bg-surface flex flex-col justify-between text-on-surface'>
@@ -30,10 +46,14 @@ export function About() {
                 Reimagined.
               </h1>
               <p className='text-lg text-on-surface-variant max-w-xl leading-relaxed'>
-                In an era of mass-market accommodation, LuxeStay exists as a
-                curated sanctuary. We reject the "grid of thousands" in favor of
-                the "hand-picked dozen," prioritizing individual soul and
-                architectural integrity over algorithmic volume.
+                {cmsContent ? cmsContent.content : (
+                  <>
+                    In an era of mass-market accommodation, LuxeStay exists as a
+                    curated sanctuary. We reject the "grid of thousands" in favor of
+                    the "hand-picked dozen," prioritizing individual soul and
+                    architectural integrity over algorithmic volume.
+                  </>
+                )}
               </p>
             </div>
             <div className='md:col-span-6 relative'>

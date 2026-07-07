@@ -1,13 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Leaf, Globe, Award, Sparkles, ArrowRight, ShieldCheck, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Navbar } from '../../components/shared/Navbar';
 import { Footer } from '../../components/shared/Footer';
+import api from '../../lib/api';
 
 export function Sustainability() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubsubscribed] = useState(false);
+  const [cmsContent, setCmsContent] = useState<{ title: string; content: string } | null>(null);
+
+  useEffect(() => {
+    const fetchCms = async () => {
+      try {
+        const response = await api.get<{ title: string; content: string; isActive: boolean }>('/cms/slug/sustainability');
+        if (response.data && response.data.content && response.data.isActive) {
+          setCmsContent(response.data);
+        }
+      } catch (e) {
+        // fallback
+      }
+    };
+    fetchCms();
+  }, []);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,11 +75,15 @@ export function Sustainability() {
         <section className='py-32 px-6 bg-surface'>
           <div className='max-w-4xl mx-auto text-center space-y-10'>
             <h2 className='font-display text-3xl md:text-5xl font-semibold tracking-tight text-on-surface'>
-              “Sustainability is the ultimate luxury.”
+              {cmsContent ? cmsContent.title : "“Sustainability is the ultimate luxury.”"}
             </h2>
             <div className='w-20 h-0.5 bg-primary mx-auto opacity-35'></div>
             <p className='text-base md:text-lg text-on-surface-variant leading-relaxed font-light max-w-3xl mx-auto'>
-              At LuxeStay, we believe the preservation of our world’s most beautiful destinations is our highest calling. Our <strong>Conscious Hospitality</strong> framework ensures that every stay contributes to environmental restoration and cultural preservation, without ever compromising the refined experience our guests expect.
+              {cmsContent ? cmsContent.content : (
+                <>
+                  At LuxeStay, we believe the preservation of our world’s most beautiful destinations is our highest calling. Our <strong>Conscious Hospitality</strong> framework ensures that every stay contributes to environmental restoration and cultural preservation, without ever compromising the refined experience our guests expect.
+                </>
+              )}
             </p>
           </div>
         </section>

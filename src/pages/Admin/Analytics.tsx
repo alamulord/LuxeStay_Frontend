@@ -45,16 +45,21 @@ export function AdminAnalytics() {
   const [stats, setStats] = useState<AnalyticsData | null>(null);
   const [chart, setChart] = useState<ChartData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [aiSuggestion, setAiSuggestion] = useState('Properties listing Matterport 3D digital walkthroughs report a 45% uplift in guest checkout conversions. Review top-performing properties above and replicate description structures for lower-performing listings.');
 
   const fetchAnalytics = async () => {
     setIsLoading(true);
     try {
-      const [kpiRes, chartRes] = await Promise.all([
+      const [kpiRes, chartRes, aiRes] = await Promise.all([
         api.get<AnalyticsData>('/analytics/kpi'),
         api.get<ChartData>('/analytics/bookings-chart'),
+        api.get<{ suggestion: string }>('/analytics/suggestions?page=analytics').catch(() => ({ data: { suggestion: '' } })),
       ]);
       setStats(kpiRes.data);
       setChart(chartRes.data);
+      if (aiRes.data?.suggestion) {
+        setAiSuggestion(aiRes.data.suggestion);
+      }
     } catch (error) {
       console.error('Failed to load analytics dashboard', error);
     } finally {
@@ -317,7 +322,7 @@ export function AdminAnalytics() {
                 <div>
                   <h4 className="font-bold text-sm font-headline">Performance Optimization Insights</h4>
                   <p className="text-xs text-indigo-100/80 leading-relaxed mt-1">
-                    Properties listing Matterport 3D digital walkthroughs report a 45% uplift in guest checkout conversions. Review top-performing properties above and replicate description structures for lower-performing listings.
+                    {aiSuggestion}
                   </p>
                 </div>
               </div>

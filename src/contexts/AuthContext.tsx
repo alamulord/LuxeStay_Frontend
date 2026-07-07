@@ -37,6 +37,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [token, user, fetchProfile]);
 
+  const hasRefreshedRef = useRef(false);
+
   // Fetch wishlist when user authenticates
   useEffect(() => {
     if (isAuthenticated) {
@@ -52,14 +54,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshIntervalRef.current = null;
     }
 
-    if (isAuthenticated && token) {
-      // Perform an immediate refresh to ensure the token is fresh on mount
-      refreshSession();
+    if (isAuthenticated) {
+      // Perform an immediate refresh only once on initial authentication/mount
+      if (!hasRefreshedRef.current) {
+        hasRefreshedRef.current = true;
+        refreshSession();
+      }
 
       // Set up recurring refresh
       refreshIntervalRef.current = setInterval(() => {
         refreshSession();
       }, SESSION_REFRESH_INTERVAL_MS);
+    } else {
+      hasRefreshedRef.current = false;
     }
 
     return () => {
@@ -68,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refreshIntervalRef.current = null;
       }
     };
-  }, [isAuthenticated, token, refreshSession]);
+  }, [isAuthenticated, refreshSession]);
 
   // ── Inactivity Auto Logout after 10 minutes ──
   useEffect(() => {

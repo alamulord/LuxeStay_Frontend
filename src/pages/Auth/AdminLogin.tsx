@@ -18,6 +18,15 @@ export function AdminLogin() {
   const navigate = useNavigate();
   const { login, logout, isLoading } = useAuth();
   const [error, setError] = React.useState<string | null>(null);
+  const [isSmallScreen, setIsSmallScreen] = React.useState(window.innerWidth < 1024);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 1024);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -39,6 +48,27 @@ export function AdminLogin() {
       setError(err.response?.data?.message || 'Invalid admin credentials.');
     }
   };
+
+  if (isSmallScreen) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center text-white font-body text-left">
+        <div className="max-w-md bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl space-y-6 flex flex-col items-center">
+          <div className="w-16 h-16 bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 rounded-2xl flex items-center justify-center animate-pulse">
+            <Shield className="w-8 h-8" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-xl font-bold font-headline">Desktop Screen Required</h1>
+            <p className="text-slate-400 text-xs leading-relaxed">
+              To protect administrative operations and maintain layout integrity, the Staff Portal is restricted to desktop devices with a screen width of <strong>1024px</strong> or wider.
+            </p>
+          </div>
+          <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">
+            Please log in from a desktop browser.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center px-4">

@@ -2,16 +2,19 @@ import { useState, useEffect } from 'react';
 import api from '../lib/api';
 import { Room, RoomFilters } from '../types/room.types';
 
-export function useRooms(filters: RoomFilters = {}) {
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const roomsQueryCache: Record<string, Room[]> = {};
 
+export function useRooms(filters: RoomFilters = {}) {
   const filterString = JSON.stringify(filters);
+  const [rooms, setRooms] = useState<Room[]>(() => roomsQueryCache[filterString] || []);
+  const [isLoading, setIsLoading] = useState(!roomsQueryCache[filterString]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRooms = async () => {
-      setIsLoading(true);
+      if (!roomsQueryCache[filterString]) {
+        setIsLoading(true);
+      }
       try {
         const params = new URLSearchParams();
         if (filters.location) params.append('location', filters.location);
@@ -27,6 +30,7 @@ export function useRooms(filters: RoomFilters = {}) {
         }
 
         const response = await api.get<Room[]>(`/rooms?${params.toString()}`);
+        roomsQueryCache[filterString] = response.data;
         setRooms(response.data);
       } catch (err: any) {
         setError(err.message);
@@ -41,14 +45,17 @@ export function useRooms(filters: RoomFilters = {}) {
   return { rooms, isLoading, error };
 }
 
+const featuredCache: { data: Room[] | null } = { data: null };
+
 export function useFeaturedRooms() {
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [rooms, setRooms] = useState<Room[]>(() => featuredCache.data || []);
+  const [isLoading, setIsLoading] = useState(!featuredCache.data);
 
   useEffect(() => {
     const fetchRooms = async () => {
       try {
         const response = await api.get<Room[]>('/rooms/featured');
+        featuredCache.data = response.data;
         setRooms(response.data);
       } catch (err) {
         console.error(err);

@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useAuthStore } from '../../store/authStore';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -16,7 +17,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoading } = useAuth();
+  const { login, logout, isLoading } = useAuth();
   const [error, setError] = React.useState<string | null>(null);
   
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
@@ -27,6 +28,12 @@ export function Login() {
     setError(null);
     try {
       await login(data.email, data.password);
+      const user = useAuthStore.getState().user;
+      if (user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') {
+        logout();
+        setError('Access denied. Administrative accounts must use the Staff or Owner portals.');
+        return;
+      }
       const params = new URLSearchParams(location.search);
       const redirect = params.get('redirect') || '/';
       navigate(redirect);

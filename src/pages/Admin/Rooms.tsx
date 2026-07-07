@@ -44,6 +44,33 @@ export function AdminRooms() {
   const [cancellationPolicy, setCancellationPolicy] = useState('Flexible (Full refund 24h prior)');
   const [isBestSeller, setIsBestSeller] = useState(false);
   const [isNewlyAdded, setIsNewlyAdded] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState('Listings with virtual 3D tours and high-resolution photo galleries see 45% higher booking conversion rates in the first 30 days of publication.');
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await api.post<{ url: string }>('/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      if (response.data?.url) {
+        setImages(prev => [...prev, response.data.url]);
+      }
+    } catch (err) {
+      console.error('Image upload failed', err);
+      alert('Failed to upload image. Please check API connection and try again.');
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
 
   const fetchRooms = async () => {
     setIsLoading(true);
@@ -59,6 +86,18 @@ export function AdminRooms() {
 
   useEffect(() => {
     fetchRooms();
+    
+    const fetchSuggestion = async () => {
+      try {
+        const response = await api.get<{ suggestion: string }>('/analytics/suggestions?page=rooms');
+        if (response.data?.suggestion) {
+          setAiSuggestion(response.data.suggestion);
+        }
+      } catch (e) {
+        console.error('Failed to fetch rooms page suggestions', e);
+      }
+    };
+    fetchSuggestion();
   }, []);
 
   const resetForm = () => {
@@ -731,21 +770,45 @@ export function AdminRooms() {
                   </h3>
                   
                   <div className="space-y-4">
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={imageUrl}
-                        onChange={(e) => setImageUrl(e.target.value)}
-                        className="flex-1 bg-[#f8f9fa] border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-600/20 font-medium text-on-surface focus:outline-none"
-                        placeholder="Paste image URL here (e.g. Unsplash image link)"
-                      />
-                      <button
-                        type="button"
-                        onClick={addImage}
-                        className="bg-primary hover:bg-primary-container text-white px-6 py-2 rounded-lg text-sm font-semibold transition-colors"
-                      >
-                        Add URL
-                      </button>
+                    <div className="flex gap-4 items-center">
+                      <div className="flex-1 flex gap-2">
+                        <input
+                          type="text"
+                          value={imageUrl}
+                          onChange={(e) => setImageUrl(e.target.value)}
+                          className="flex-1 bg-[#f8f9fa] border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-600/20 font-medium text-on-surface focus:outline-none"
+                          placeholder="Paste image URL here (e.g. Unsplash image link)"
+                        />
+                        <button
+                          type="button"
+                          onClick={addImage}
+                          className="bg-primary/10 hover:bg-primary/20 text-primary px-6 py-2 rounded-lg text-sm font-semibold transition-colors"
+                        >
+                          Add URL
+                        </button>
+                      </div>
+
+                      <div className="relative">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          disabled={isUploadingImage}
+                          className="hidden"
+                          id="file-upload-input"
+                        />
+                        <label
+                          htmlFor="file-upload-input"
+                          className="bg-primary hover:bg-primary-container text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors cursor-pointer inline-flex items-center gap-2"
+                        >
+                          {isUploadingImage ? (
+                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          ) : (
+                            <span className="w-4 h-4 border-2 border-dashed border-white rounded-full flex items-center justify-center text-[10px] font-bold">+</span>
+                          )}
+                          {isUploadingImage ? 'Uploading...' : 'Upload Image'}
+                        </label>
+                      </div>
                     </div>
 
                     {images.length === 0 ? (
@@ -891,7 +954,7 @@ export function AdminRooms() {
                   <Lightbulb className="w-8 h-8 text-indigo-300" />
                   <h4 className="font-bold text-sm">Optimization Tip</h4>
                   <p className="text-xs text-indigo-100/80 leading-relaxed">
-                    Listings with virtual 3D tours and high-resolution photo galleries see 45% higher booking conversion rates in the first 30 days of publication.
+                    {aiSuggestion}
                   </p>
                 </div>
               </div>
