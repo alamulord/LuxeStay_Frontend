@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { AdminTopBar } from '../../components/admin/AdminTopBar';
 import api from '../../lib/api';
@@ -15,14 +16,28 @@ interface PaymentInfo {
   createdAt: string;
   booking: {
     id: string;
-    room: { title: string };
+    createdAt: string;
+    room: { title: string; city?: string; country?: string };
     user: { firstName: string; lastName: string; email: string };
   };
 }
 
 export function AdminPayments() {
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
+
   const [payments, setPayments] = useState<PaymentInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const filteredPayments = payments.filter((payment) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    const guestName = `${payment.booking?.user?.firstName || ''} ${payment.booking?.user?.lastName || ''}`.toLowerCase();
+    const guestEmail = (payment.booking?.user?.email || '').toLowerCase();
+    const roomTitle = (payment.booking?.room?.title || '').toLowerCase();
+    const txnId = (payment.transactionId || '').toLowerCase();
+    return guestName.includes(query) || guestEmail.includes(query) || roomTitle.includes(query) || txnId.includes(query);
+  });
 
   const fetchPayments = async () => {
     setIsLoading(true);
@@ -106,6 +121,7 @@ export function AdminPayments() {
                   <tr className="bg-surface-container-low border-b border-outline_variant/10">
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on_surface_variant">Guest / Booking</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on_surface_variant">Property</th>
+                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on_surface_variant">Dates</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on_surface_variant">Gateway & Txn</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on_surface_variant">Amount</th>
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on_surface_variant">Status</th>
@@ -113,16 +129,31 @@ export function AdminPayments() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-outline_variant/5">
-                  {payments.map((payment) => (
+                  {filteredPayments.map((payment) => (
                     <tr key={payment.id} className="hover:bg-slate-50 transition-colors group">
                       <td className="px-6 py-4">
-                        <p className="font-semibold text-sm">
+                        <p className="font-semibold text-sm text-[#191c1e]">
                           {payment.booking?.user?.firstName || 'Unknown'} {payment.booking?.user?.lastName || 'User'}
                         </p>
                         <p className="text-xs text-on_surface_variant">{payment.booking?.user?.email || 'N/A'}</p>
                       </td>
-                      <td className="px-6 py-4 text-sm font-medium">
-                        {payment.booking?.room?.title || 'N/A'}
+                      <td className="px-6 py-4">
+                        <p className="text-sm font-semibold text-[#191c1e]">{payment.booking?.room?.title || 'N/A'}</p>
+                        {payment.booking?.room?.city && (
+                          <p className="text-xs text-on_surface_variant">{payment.booking.room.city}, {payment.booking.room.country}</p>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-xs space-y-1 font-medium">
+                          <p className="text-[#191c1e]">
+                            <span className="text-slate-400 font-bold uppercase text-[9px] tracking-wide block sm:inline mr-1">Booked:</span>
+                            {payment.booking?.createdAt ? new Date(payment.booking.createdAt).toLocaleDateString() : 'N/A'}
+                          </p>
+                          <p className="text-[#191c1e]">
+                            <span className="text-slate-400 font-bold uppercase text-[9px] tracking-wide block sm:inline mr-1">Paid:</span>
+                            {new Date(payment.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <span className="inline-block bg-slate-100 text-[10px] font-bold px-2 py-0.5 rounded uppercase text-slate-600 mb-1">

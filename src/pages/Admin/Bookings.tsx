@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { AdminTopBar } from '../../components/admin/AdminTopBar';
 import { Booking } from '../../types/booking.types';
@@ -7,11 +8,23 @@ import { Calendar, CheckCircle, XCircle, Clock, Check } from 'lucide-react';
 import { cn, formatCurrency } from '../../lib/utils';
 
 export function AdminBookings() {
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
+
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [isLoading, setIsLoading] = useState(true);
+
+  const filteredBookings = bookings.filter((b) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    const guestName = `${b.user?.firstName || ''} ${b.user?.lastName || ''}`.toLowerCase();
+    const guestEmail = (b.user?.email || '').toLowerCase();
+    const roomTitle = (b.room?.title || '').toLowerCase();
+    return guestName.includes(query) || guestEmail.includes(query) || roomTitle.includes(query);
+  });
 
   const fetchBookings = async () => {
     setIsLoading(true);
@@ -149,7 +162,7 @@ export function AdminBookings() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-outline_variant/5">
-                  {bookings.map((booking) => (
+                  {filteredBookings.map((booking) => (
                     <tr key={booking.id} className="hover:bg-slate-50 transition-colors group">
                       <td className="px-6 py-4">
                         <p className="font-semibold text-sm">{booking.user?.firstName} {booking.user?.lastName}</p>

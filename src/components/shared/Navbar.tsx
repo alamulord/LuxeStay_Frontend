@@ -36,6 +36,12 @@ export function Navbar() {
             {/* Center Navigation */}
             <div className="hidden md:flex items-center gap-8">
               <Link
+                to="/search"
+                className="text-sm font-headline font-semibold text-on-surface hover:text-primary transition-colors duration-200"
+              >
+                Search
+              </Link>
+              <Link
                 to="/immersive-experiences"
                 className="text-sm font-headline font-semibold text-on-surface hover:text-primary transition-colors duration-200"
               >

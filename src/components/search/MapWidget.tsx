@@ -127,7 +127,16 @@ export function MapWidget({ rooms, focusedRoomId, onSelectRoom }: MapWidgetProps
 
     leafletMap.current = map;
 
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+
+    if (mapRef.current) {
+      resizeObserver.observe(mapRef.current);
+    }
+
     return () => {
+      resizeObserver.disconnect();
       if (leafletMap.current) {
         leafletMap.current.remove();
         leafletMap.current = null;

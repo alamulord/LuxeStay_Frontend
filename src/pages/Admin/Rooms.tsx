@@ -3,6 +3,7 @@ import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { AdminTopBar } from '../../components/admin/AdminTopBar';
 import { Room } from '../../types/room.types';
 import api from '../../lib/api';
+import { useSearchParams } from 'react-router-dom';
 import { 
   Plus, X, Search, ChevronRight, Eye, Edit, Trash, 
   MoreVertical, Lightbulb, Shield, Calendar, 
@@ -15,8 +16,19 @@ export function AdminRooms() {
   const [view, setView] = useState<'list' | 'create' | 'edit'>('list');
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
 
-  // Filter & Sort states
-  const [searchQuery, setSearchQuery] = useState('');
+  // Filter & Sort states via search params
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
+  const setSearchQuery = (val: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (val) {
+      newParams.set('q', val);
+    } else {
+      newParams.delete('q');
+    }
+    setSearchParams(newParams);
+  };
+
   const [categoryFilter, setCategoryFilter] = useState('All Categories');
   const [statusFilter, setStatusFilter] = useState('All Status');
   const [sortBy, setSortBy] = useState('Newest First');

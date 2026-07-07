@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Droplets, Flame, Wifi, Tv, ChefHat, Waves, ArrowLeft } from 'lucide-react';
@@ -7,6 +7,7 @@ import { Footer } from '../components/shared/Footer';
 import { LoadingSpinner } from '../components/shared/LoadingSpinner';
 import { useRoom } from '../hooks/useRooms';
 import { useBookingStore } from '../store/bookingStore';
+import api from '../lib/api';
 import { fadeIn } from '../lib/animations';
 import { RoomGallery } from '../components/property/RoomGallery';
 import { RoomCarouselModal } from '../components/property/RoomCarouselModal';
@@ -38,6 +39,38 @@ export function RoomDetails() {
   const [is3dActive, setIs3dActive] = useState(false);
   const [searchParams] = useSearchParams();
   const fromAi = searchParams.get('from_ai') === 'true';
+
+  interface ReviewItem {
+    id: string;
+    rating: number;
+    comment: string;
+    createdAt: string;
+    user: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      avatar?: string | null;
+    };
+  }
+
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
+  const [isReviewsLoading, setIsReviewsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!room?.id) return;
+    const fetchReviews = async () => {
+      setIsReviewsLoading(true);
+      try {
+        const res = await api.get<ReviewItem[]>(`/reviews/room/${room.id}`);
+        setReviews(res.data);
+      } catch (err) {
+        console.error('Failed to fetch reviews', err);
+      } finally {
+        setIsReviewsLoading(false);
+      }
+    };
+    fetchReviews();
+  }, [room?.id]);
 
   const images = room && room.images && room.images.length > 0 ? room.images : [
     'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&h=600&fit=crop',
@@ -117,18 +150,69 @@ export function RoomDetails() {
           View All Reviews
         </Link>
       </div>
-      <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-ambient border border-outline-variant/10">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-headline font-bold">JV</div>
-          <div>
-            <p className="font-headline font-bold text-sm text-on-surface">Julian V.</p>
-            <p className="text-xs text-on-surface-variant uppercase tracking-wider font-body">London · April 2024</p>
-          </div>
+
+      {isReviewsLoading ? (
+        <div className="text-center py-6 text-xs text-on-surface-variant font-medium">
+          Loading guest impressions...
         </div>
-        <p className="text-sm text-on-surface-variant leading-relaxed italic font-body">
-          "An absolute masterpiece. Waking up to the view of the city from our private terrace felt like living inside a painting. The concierge service was impeccable."
-        </p>
-      </div>
+      ) : reviews.length === 0 ? (
+        <div className="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/10 text-center text-xs text-on-surface-variant font-medium">
+          No guest impressions yet. Be the first to share your journey!
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {reviews.slice(0, 3).map((review) => {
+            const userInitials = `${review.user?.firstName?.[0] || ''}${review.user?.lastName?.[0] || ''}`.toUpperCase();
+            return (
+              <div key={review.id} className="bg-surface-container-lowest rounded-2xl p-6 shadow-ambient border border-outline-variant/10">
+                <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                  <div className="flex items-center gap-3">
+                    {review.user?.avatar ? (
+                      <img 
+                        src={review.user.avatar} 
+                        alt={`${review.user.firstName} avatar`} 
+                        className="w-10 h-10 rounded-full object-cover border border-outline-variant/10" 
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-headline font-bold text-primary">
+                        {userInitials || 'G'}
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-headline font-bold text-sm text-on-surface">
+                        {review.user?.firstName || 'Anonymous'} {review.user?.lastName?.[0] ? `${review.user.lastName[0]}.` : ''}
+                      </p>
+                      <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-body">
+                        {new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Rating Stars */}
+                  <div className="flex gap-0.5">
+                    {[1, 2, 3, 4, 5].map((starIdx) => (
+                      <Star
+                        key={starIdx}
+                        className={`w-3.5 h-3.5 ${
+                          starIdx <= review.rating 
+                            ? 'text-yellow-400 fill-current' 
+                            : 'text-slate-200'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                
+                {review.comment && (
+                  <p className="text-sm text-on-surface-variant leading-relaxed italic font-body">
+                    "{review.comment}"
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 

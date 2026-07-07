@@ -17,8 +17,16 @@ type LoginForm = z.infer<typeof loginSchema>;
 export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, logout, isLoading } = useAuth();
+  const { login, logout, isLoading, isAuthenticated } = useAuth();
   const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      const params = new URLSearchParams(location.search);
+      const redirect = params.get('redirect') || '/';
+      navigate(redirect, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location.search]);
   
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),

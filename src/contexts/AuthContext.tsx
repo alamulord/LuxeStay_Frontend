@@ -10,7 +10,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (data: { email: string; password: string; firstName: string; lastName: string }) => Promise<void>;
+  register: (data: { email: string; password: string; firstName: string; lastName: string; phone?: string }) => Promise<void>;
   logout: () => void;
   fetchProfile: () => Promise<void>;
   updateProfile: (data: { firstName: string; lastName: string; phone?: string; dateOfBirth?: string; avatar?: string }) => Promise<void>;

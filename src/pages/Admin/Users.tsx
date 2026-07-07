@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { AdminTopBar } from '../../components/admin/AdminTopBar';
 import { User, UserRole } from '../../types/user.types';
@@ -14,7 +15,18 @@ export function AdminUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get('q') || '';
+  const setSearch = (val: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (val) {
+      newParams.set('q', val);
+    } else {
+      newParams.delete('q');
+    }
+    setSearchParams(newParams);
+  };
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [isLoading, setIsLoading] = useState(true);

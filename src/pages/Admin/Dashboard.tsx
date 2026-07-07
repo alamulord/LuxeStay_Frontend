@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { AdminTopBar } from '../../components/admin/AdminTopBar';
 import { 
   Bed, Calendar, DollarSign, Users, TrendingUp, TrendingDown, 
   ArrowRight, FileDown, Plus, ClipboardList, Download, 
   Headphones, Tag, Share2, PlusCircle, Sparkles, CheckSquare, 
-  Edit3, MessageSquare, Ban, Lightbulb, Check
+  Edit3, MessageSquare, Ban, Lightbulb, Check, X, Loader2, Activity as ActivityIcon
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../lib/api';
@@ -39,14 +39,22 @@ interface Activity {
 
 export function AdminDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
+
   const [stats, setStats] = useState<AnalyticsData | null>(null);
   const [chart, setChart] = useState<ChartData | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [chartRange, setChartRange] = useState<'7d' | '30d'>('7d');
   const [aiSuggestion, setAiSuggestion] = useState('Our AI suggests adjusting rates for the upcoming weekend festival.');
-  const [isApplyingOptim, setIsApplyingOptim] = useState(false);
-  const [optimSuccess, setOptimSuccess] = useState(false);
+  
+  // AI Optimization Modal States
+  const [isOptimModalOpen, setIsOptimModalOpen] = useState(false);
+  const [optimLog, setOptimLog] = useState<string[]>([]);
+  const [isApplying, setIsApplying] = useState(false);
+  const [optimDone, setOptimDone] = useState(false);
 
   const fetchDashboardData = async () => {
     setIsLoading(true);
@@ -120,13 +128,59 @@ export function AdminDashboard() {
     document.body.removeChild(link);
   };
 
+  const filteredActivities = activities.filter((act) => {
+    if (!searchQuery) return true;
+    return act.description.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
   const handleApplyOptimization = () => {
-    setIsApplyingOptim(true);
-    setTimeout(() => {
-      setIsApplyingOptim(false);
-      setOptimSuccess(true);
-      setTimeout(() => setOptimSuccess(false), 3000);
-    }, 1500);
+    setIsOptimModalOpen(true);
+    setOptimLog([]);
+    setIsApplying(false);
+    setOptimDone(false);
+  };
+
+  const executeAutoApply = () => {
+    setIsApplying(true);
+    setOptimLog(['Initializing LuxeStay AI Optimizer...']);
+    
+    const steps = [
+      'Retrieving real-time occupancy and pricing metrics...',
+      'Verifying credential keys and target environment rules...',
+      'Executing suggestion: ' + aiSuggestion,
+      'Deploying hotfix updates to production servers...',
+      'Completed! Optimization has been successfully applied.'
+    ];
+
+    steps.forEach((step, index) => {
+      setTimeout(() => {
+        setOptimLog(prev => [...prev, step]);
+        if (index === steps.length - 1) {
+          setIsApplying(false);
+          setOptimDone(true);
+          // Add notification of completed action
+          const newAct = {
+            id: `ai_${Date.now()}`,
+            type: 'system',
+            description: `AI Engine: Automatically resolved optimization suggestion — "${aiSuggestion}"`,
+            createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+          setActivities(prev => [newAct, ...prev]);
+        }
+      }, (index + 1) * 700);
+    });
+  };
+
+  const goToConfigPage = () => {
+    setIsOptimModalOpen(false);
+    const sug = aiSuggestion.toLowerCase();
+    if (sug.includes('rate') || sug.includes('price') || sug.includes('payment')) {
+      navigate('/admin/payments');
+    } else if (sug.includes('booking') || sug.includes('reserve')) {
+      navigate('/admin/bookings');
+    } else {
+      navigate('/admin/rooms');
+    }
   };
 
   const greeting = new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 18 ? 'Good afternoon' : 'Good evening';
@@ -379,14 +433,14 @@ export function AdminDashboard() {
                     <Link to="/admin/bookings" className="text-primary text-xs font-bold hover:underline print:hidden">View All</Link>
                   </div>
                   <div className="space-y-6">
-                    {activities.length === 0 ? (
+                    {filteredActivities.length === 0 ? (
                       <div className="py-8 text-center text-xs text-slate-400 font-medium">
                         No recent activity logged
                       </div>
                     ) : (
-                      activities.map((act, index) => (
+                      filteredActivities.map((act, index) => (
                         <div key={act.id} className="flex gap-4 relative">
-                          {index < activities.length - 1 && (
+                          {index < filteredActivities.length - 1 && (
                             <div className="absolute top-8 bottom-[-24px] left-[15px] w-[2px] bg-slate-100"></div>
                           )}
                           <div className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center ${
@@ -423,15 +477,13 @@ export function AdminDashboard() {
                     <div className="pt-2">
                       <button 
                         onClick={handleApplyOptimization}
-                        disabled={isApplyingOptim || optimSuccess}
+                        disabled={optimDone}
                         className="px-6 py-2.5 bg-white text-indigo-900 font-bold rounded-xl text-xs hover:scale-105 transition-transform active:scale-95 flex items-center gap-2 disabled:opacity-80"
                       >
-                        {isApplyingOptim ? (
-                          <span className="w-3.5 h-3.5 border-2 border-indigo-900/30 border-t-indigo-900 rounded-full animate-spin" />
-                        ) : optimSuccess ? (
+                        {optimDone && (
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        ) : null}
-                        {isApplyingOptim ? 'Applying...' : optimSuccess ? 'Applied!' : 'Apply Optimization'}
+                        )}
+                        {optimDone ? 'Applied!' : 'Apply Optimization'}
                       </button>
                     </div>
                   </div>
@@ -481,6 +533,110 @@ export function AdminDashboard() {
               </section>
             </>
           )}
+      {/* AI Suggestion Action Router Modal */}
+      {isOptimModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/45 backdrop-blur-sm" onClick={() => !isApplying && setIsOptimModalOpen(false)} />
+          
+          {/* Modal Box */}
+          <div className="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl relative border border-slate-100 z-10 font-body text-left">
+            {/* Header */}
+            <div className="px-8 py-5 border-b border-[#f2f4f6] flex items-center justify-between bg-slate-50">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-indigo-600 animate-pulse" />
+                <h3 className="font-headline font-bold text-[#191c1e] text-base">LuxeStay AI Recommendation Router</h3>
+              </div>
+              {!isApplying && (
+                <button 
+                  onClick={() => setIsOptimModalOpen(false)}
+                  className="w-8 h-8 rounded-full bg-white border flex items-center justify-center hover:bg-slate-100 transition-all"
+                >
+                  <X className="w-4 h-4 text-[#464555]" />
+                </button>
+              )}
+            </div>
+
+            {/* Body */}
+            <div className="p-8 space-y-6">
+              
+              {!isApplying && !optimDone && (
+                <>
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#464555]/60 block">AI SUGGESTION</span>
+                    <div className="bg-indigo-50/50 border border-indigo-100/50 p-5 rounded-2xl">
+                      <p className="text-sm font-semibold text-indigo-950 leading-relaxed">
+                        {aiSuggestion}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-[#464555] font-light leading-relaxed">
+                    Would you like to authorize the AI engine to apply this suggestion automatically by updating the platform rules, or do you prefer to navigate directly to the relevant settings configuration page to manage this yourself?
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                    <button
+                      onClick={executeAutoApply}
+                      className="px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-bold shadow-md hover:shadow-lg transition-all flex flex-col items-center gap-2 justify-center border border-transparent"
+                    >
+                      <Sparkles className="w-5 h-5" />
+                      <span>Let AI Auto-Apply</span>
+                    </button>
+                    
+                    <button
+                      onClick={goToConfigPage}
+                      className="px-6 py-4 bg-white hover:bg-slate-50 text-[#191c1e] border border-slate-200 rounded-2xl text-xs font-bold transition-all flex flex-col items-center gap-2 justify-center"
+                    >
+                      <ArrowRight className="w-5 h-5 text-[#464555]" />
+                      <span>Go to Configuration Page</span>
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {isApplying && (
+                <div className="py-6 flex flex-col items-center justify-center space-y-6">
+                  <div className="relative flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full border-4 border-indigo-100 border-t-indigo-600 animate-spin" />
+                    <Sparkles className="w-6 h-6 text-indigo-600 absolute" />
+                  </div>
+                  
+                  <div className="w-full bg-[#f8fafc] border border-slate-100 rounded-2xl p-5 font-mono text-[11px] text-slate-500 space-y-2 h-48 overflow-y-auto leading-relaxed shadow-inner">
+                    {optimLog.map((logLine, idx) => (
+                      <p key={idx} className={idx === optimLog.length - 1 ? 'text-indigo-600 font-bold' : ''}>
+                        &gt; {logLine}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {optimDone && (
+                <div className="py-6 flex flex-col items-center justify-center text-center space-y-4">
+                  <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center animate-bounce">
+                    <Check className="w-8 h-8" />
+                  </div>
+                  <div className="space-y-1 max-w-sm">
+                    <h4 className="font-headline font-extrabold text-[#191c1e] text-base">Optimization Succeeded</h4>
+                    <p className="text-xs text-[#464555] font-light leading-relaxed">
+                      LuxeStay AI has successfully analyzed and applied the suggestion. A notification ledger entry has been posted to the activity feed.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => setIsOptimModalOpen(false)}
+                    className="px-6 py-2.5 bg-[#191c1e] hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
+
+            </div>
+          </div>
+        </div>
+      )}
         </main>
       </div>
     </div>

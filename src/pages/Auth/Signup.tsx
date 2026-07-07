@@ -3,13 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Phone } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 const signupSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
   lastName: z.string().min(2, 'Last name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
+  phone: z.string().optional(),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string(),
 }).refine(data => data.password === data.confirmPassword, {
@@ -21,8 +22,14 @@ type SignupForm = z.infer<typeof signupSchema>;
 
 export function Signup() {
   const navigate = useNavigate();
-  const { register: registerUser, isLoading } = useAuth();
+  const { register: registerUser, isLoading, isAuthenticated } = useAuth();
   const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
   
   const { register, handleSubmit, formState: { errors } } = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
@@ -36,6 +43,7 @@ export function Signup() {
         password: data.password,
         firstName: data.firstName,
         lastName: data.lastName,
+        phone: data.phone,
       });
       navigate('/');
     } catch (err: any) {
@@ -104,6 +112,22 @@ export function Signup() {
               </div>
               {errors.email && (
                 <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Phone Number</label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-on_surface_variant" />
+                  <input
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    className="input-field pl-10"
+                    {...register('phone')}
+                  />
+              </div>
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
               )}
             </div>
 

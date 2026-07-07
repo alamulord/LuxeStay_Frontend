@@ -16,9 +16,18 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export function AdminLogin() {
   const navigate = useNavigate();
-  const { login, logout, isLoading } = useAuth();
+  const { login, logout, isLoading, isAuthenticated } = useAuth();
   const [error, setError] = React.useState<string | null>(null);
   const [isSmallScreen, setIsSmallScreen] = React.useState(window.innerWidth < 1024);
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      const user = useAuthStore.getState().user;
+      if (user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') {
+        navigate('/admin/dashboard', { replace: true });
+      }
+    }
+  }, [isAuthenticated, navigate]);
 
   React.useEffect(() => {
     const handleResize = () => {

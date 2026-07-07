@@ -271,7 +271,7 @@ export function Search() {
             </div>
 
             {/* Right Column: Interactive Sticky Map */}
-            <div className="sticky top-[108px] hidden md:block w-full h-[670px] lg:h-[670px] rounded-[2rem] overflow-hidden shadow-ambient-lg border border-outline-variant/10 z-10 bg-surface-container-low">
+            <div className="sticky top-[108px] hidden md:block w-full h-[calc(100vh-140px)] min-h-[600px] max-h-[850px] rounded-[2rem] overflow-hidden shadow-ambient-lg border border-outline-variant/10 z-10 bg-surface-container-low">
               <MapWidget 
                 rooms={displayRooms}
                 focusedRoomId={focusedRoomId}
