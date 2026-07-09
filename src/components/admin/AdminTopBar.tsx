@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Search, Bell, HelpCircle, LogOut, UserCircle, ChevronDown, Globe, Activity, BookOpen, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import api from '../../lib/api';
 
 interface AdminTopBarProps {
   title: string;
@@ -15,6 +16,19 @@ export function AdminTopBar({ title }: AdminTopBarProps) {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
+  interface AdminNotification {
+    id: string;
+    title: string;
+    message: string;
+    type: string;
+    isRead: boolean;
+    createdAt: string;
+  }
+
+  const [notifications, setNotifications] = useState<AdminNotification[]>([]);
+  const [isNotifDropdownOpen, setIsNotifDropdownOpen] = useState(false);
+  const notifDropdownRef = useRef<HTMLDivElement>(null);
+
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get('q') || '';
 
@@ -28,10 +42,28 @@ export function AdminTopBar({ title }: AdminTopBarProps) {
 
   const roleBadge = user?.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin';
 
+  const fetchNotifications = async () => {
+    try {
+      const response = await api.get<AdminNotification[]>('/notifications');
+      setNotifications(response.data);
+    } catch (err) {
+      console.error('Failed to load notifications', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 12000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setIsDropdownOpen(false);
+      }
+      if (notifDropdownRef.current && !notifDropdownRef.current.contains(e.target as Node)) {
+        setIsNotifDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -41,6 +73,30 @@ export function AdminTopBar({ title }: AdminTopBarProps) {
   const handleLogout = () => {
     logout();
     navigate('/admin/login');
+  };
+
+  const handleNotifClick = () => {
+    setIsNotifDropdownOpen(!isNotifDropdownOpen);
+    setIsDropdownOpen(false);
+    fetchNotifications();
+  };
+
+  const markRead = async (id: string) => {
+    try {
+      await api.put(`/notifications/${id}/read`);
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const markAllRead = async () => {
+    try {
+      await api.put('/notifications/mark-all-read');
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +109,8 @@ export function AdminTopBar({ title }: AdminTopBarProps) {
     }
     setSearchParams(newParams);
   };
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   return (
     <>
@@ -83,10 +141,66 @@ export function AdminTopBar({ title }: AdminTopBarProps) {
           </button>
 
           {/* Notifications */}
-          <button className="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-[#f2f4f6] transition-colors relative">
-            <Bell className="w-[18px] h-[18px] text-[#464555]" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full" />
-          </button>
+          <div className="relative" ref={notifDropdownRef}>
+            <button 
+              onClick={handleNotifClick}
+              className="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-[#f2f4f6] transition-colors relative"
+            >
+              <Bell className="w-[18px] h-[18px] text-[#464555]" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full animate-pulse" />
+              )}
+            </button>
+
+            {isNotifDropdownOpen && (
+              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-ambient-lg border border-slate-100 py-3 z-50 flex flex-col max-h-[350px] overflow-hidden text-left font-body">
+                {/* Dropdown Header */}
+                <div className="px-4 pb-2.5 border-b border-[#f2f4f6] flex items-center justify-between text-xs font-bold text-[#191c1e]">
+                  <span>Notifications</span>
+                  {unreadCount > 0 && (
+                    <button 
+                      onClick={markAllRead}
+                      className="text-admin-primary hover:underline"
+                    >
+                      Mark all read
+                    </button>
+                  )}
+                </div>
+
+                {/* Dropdown List */}
+                <div className="overflow-y-auto flex-1 divide-y divide-[#f2f4f6]">
+                  {notifications.length === 0 ? (
+                    <div className="py-8 text-center text-xs text-slate-400 font-medium">
+                      No notifications yet
+                    </div>
+                  ) : (
+                    notifications.map((notif) => (
+                      <div 
+                        key={notif.id}
+                        onClick={() => !notif.isRead && markRead(notif.id)}
+                        className={`p-4 text-xs space-y-1 hover:bg-[#f2f4f6]/50 cursor-pointer transition-colors ${
+                          !notif.isRead ? 'bg-indigo-50/20 font-medium' : 'opacity-85'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`font-bold ${!notif.isRead ? 'text-[#191c1e]' : 'text-slate-500'}`}>
+                            {notif.title}
+                          </span>
+                          {!notif.isRead && (
+                            <span className="w-1.5 h-1.5 bg-admin-primary rounded-full shrink-0 animate-pulse" />
+                          )}
+                        </div>
+                        <p className="text-[#464555] leading-relaxed">{notif.message}</p>
+                        <p className="text-[10px] text-slate-400">
+                          {new Date(notif.createdAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Divider */}
           <div className="w-px h-8 bg-[#f2f4f6]" />

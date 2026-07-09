@@ -147,11 +147,11 @@ export function AdminPayments() {
                         <div className="text-xs space-y-1 font-medium">
                           <p className="text-[#191c1e]">
                             <span className="text-slate-400 font-bold uppercase text-[9px] tracking-wide block sm:inline mr-1">Booked:</span>
-                            {payment.booking?.createdAt ? new Date(payment.booking.createdAt).toLocaleDateString() : 'N/A'}
+                            {payment.booking?.createdAt ? new Date(payment.booking.createdAt).toLocaleString() : 'N/A'}
                           </p>
                           <p className="text-[#191c1e]">
                             <span className="text-slate-400 font-bold uppercase text-[9px] tracking-wide block sm:inline mr-1">Paid:</span>
-                            {new Date(payment.createdAt).toLocaleDateString()}
+                            {new Date(payment.createdAt).toLocaleString()}
                           </p>
                         </div>
                       </td>

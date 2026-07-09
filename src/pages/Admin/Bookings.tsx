@@ -165,8 +165,11 @@ export function AdminBookings() {
                   {filteredBookings.map((booking) => (
                     <tr key={booking.id} className="hover:bg-slate-50 transition-colors group">
                       <td className="px-6 py-4">
-                        <p className="font-semibold text-sm">{booking.user?.firstName} {booking.user?.lastName}</p>
+                        <p className="font-semibold text-sm text-[#191c1e]">{booking.user?.firstName} {booking.user?.lastName}</p>
                         <p className="text-xs text-on_surface_variant">{booking.user?.email}</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1.5">
+                          Booked: {new Date(booking.createdAt).toLocaleString()}
+                        </p>
                       </td>
                       <td className="px-6 py-4">
                         <p className="font-medium text-sm">{booking.room?.title}</p>

@@ -3,11 +3,12 @@ import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { AdminTopBar } from '../../components/admin/AdminTopBar';
 import { Room } from '../../types/room.types';
 import api from '../../lib/api';
-import { useSearchParams } from 'react-router-dom';
+import { cn } from '../../lib/utils';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
   Plus, X, Search, ChevronRight, Eye, Edit, Trash, 
   MoreVertical, Lightbulb, Shield, Calendar, 
-  MapPin, Image as ImageIcon, Sparkles, Sliders, Check
+  MapPin, Image as ImageIcon, Sparkles, Sliders, Check, HelpCircle, AlertCircle
 } from 'lucide-react';
 
 export function AdminRooms() {
@@ -15,6 +16,7 @@ export function AdminRooms() {
   const [isLoading, setIsLoading] = useState(true);
   const [view, setView] = useState<'list' | 'create' | 'edit'>('list');
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
+  const navigate = useNavigate();
 
   // Filter & Sort states via search params
   const [searchParams, setSearchParams] = useSearchParams();
@@ -43,10 +45,12 @@ export function AdminRooms() {
   const [bedrooms, setBedrooms] = useState('1');
   const [beds, setBeds] = useState('1');
   const [bathrooms, setBathrooms] = useState('1');
+  const [squareFeet, setSquareFeet] = useState('');
   const [location, setLocation] = useState('');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('');
+  const [zipCode, setZipCode] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const [tour3dUrl, setTour3dUrl] = useState('');
@@ -58,6 +62,41 @@ export function AdminRooms() {
   const [isNewlyAdded, setIsNewlyAdded] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState('Listings with virtual 3D tours and high-resolution photo galleries see 45% higher booking conversion rates in the first 30 days of publication.');
+
+  // Amenities States
+  const [availableAmenities, setAvailableAmenities] = useState<any[]>([]);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [newAmenityName, setNewAmenityName] = useState('');
+  const [isAddingAmenity, setIsAddingAmenity] = useState(false);
+  const [showAmenityInput, setShowAmenityInput] = useState(false);
+
+  // Custom Notification Modal State
+  const [notification, setNotification] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'success' | 'error' | 'confirm' | 'info';
+    onConfirm?: () => void;
+  } | null>(null);
+
+  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setNotification({
+      isOpen: true,
+      title,
+      message,
+      type,
+    });
+  };
+
+  const showConfirm = (title: string, message: string, onConfirm: () => void) => {
+    setNotification({
+      isOpen: true,
+      title,
+      message,
+      type: 'confirm',
+      onConfirm,
+    });
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -78,7 +117,7 @@ export function AdminRooms() {
       }
     } catch (err) {
       console.error('Image upload failed', err);
-      alert('Failed to upload image. Please check API connection and try again.');
+      showAlert('Error', 'Failed to upload image. Please check API connection and try again.', 'error');
     } finally {
       setIsUploadingImage(false);
     }
@@ -99,6 +138,16 @@ export function AdminRooms() {
   useEffect(() => {
     fetchRooms();
     
+    const fetchAmenities = async () => {
+      try {
+        const res = await api.get<any[]>('/rooms/amenities/all');
+        setAvailableAmenities(res.data);
+      } catch (err) {
+        console.error('Failed to fetch amenities', err);
+      }
+    };
+    fetchAmenities();
+
     const fetchSuggestion = async () => {
       try {
         const response = await api.get<{ suggestion: string }>('/analytics/suggestions?page=rooms');
@@ -112,6 +161,24 @@ export function AdminRooms() {
     fetchSuggestion();
   }, []);
 
+  const handleAddCustomAmenity = async () => {
+    const name = newAmenityName.trim();
+    if (!name) return;
+    setIsAddingAmenity(true);
+    try {
+      const res = await api.post<any>('/rooms/amenities/create', { name, icon: '⭐' });
+      setAvailableAmenities(prev => [...prev, res.data]);
+      setSelectedAmenities(prev => [...prev, res.data.id]);
+      setNewAmenityName('');
+      setShowAmenityInput(false);
+    } catch (err: any) {
+      showAlert('Error', err?.response?.data?.message || 'Failed to add amenity', 'error');
+    } finally {
+      setIsAddingAmenity(false);
+    }
+  };
+
+
   const resetForm = () => {
     setTitle('');
     setDescription('');
@@ -120,10 +187,12 @@ export function AdminRooms() {
     setBedrooms('1');
     setBeds('1');
     setBathrooms('1');
+    setSquareFeet('');
     setLocation('');
     setAddress('');
     setCity('');
     setCountry('');
+    setZipCode('');
     setImageUrl('');
     setImages([]);
     setTour3dUrl('');
@@ -133,8 +202,10 @@ export function AdminRooms() {
     setCancellationPolicy('Flexible (Full refund 24h prior)');
     setIsBestSeller(false);
     setIsNewlyAdded(false);
+    setSelectedAmenities([]);
     setEditingRoom(null);
   };
+
 
   const handleEditInit = (room: Room) => {
     setEditingRoom(room);
@@ -145,10 +216,12 @@ export function AdminRooms() {
     setBedrooms(room.bedrooms.toString());
     setBeds(room.beds.toString());
     setBathrooms(room.bathrooms.toString());
+    setSquareFeet(room.squareFeet ? room.squareFeet.toString() : '');
     setLocation(room.location);
     setAddress(room.address);
     setCity(room.city);
     setCountry(room.country);
+    setZipCode(room.zipCode || '');
     setImages(room.images);
     setTour3dUrl(room.tour3dUrl || '');
     setIsFeatured(room.isFeatured);
@@ -156,22 +229,78 @@ export function AdminRooms() {
     setCategory(room.bedrooms > 2 ? 'Villa' : room.bedrooms > 1 ? 'Suite' : 'Penthouse Suite');
     setIsBestSeller(room.isFeatured && Math.random() > 0.5);
     setIsNewlyAdded(new Date(room.createdAt).getTime() > Date.now() - 30 * 24 * 60 * 60 * 1000);
+    setSelectedAmenities(room.amenities?.map(ra => ra.amenity?.id).filter(Boolean) || []);
     setView('edit');
   };
 
   const handleDelete = async (room: Room) => {
-    if (!window.confirm(`Are you sure you want to delete ${room.title}?`)) return;
-    try {
-      await api.delete(`/rooms/${room.id}`);
-      setRooms(prev => prev.filter(r => r.id !== room.id));
-      setSelectedRoomIds(prev => prev.filter(id => id !== room.id));
-    } catch (error) {
-      alert('Failed to delete room');
-    }
+    showConfirm('Delete Room', `Are you sure you want to delete ${room.title}?`, async () => {
+      try {
+        await api.delete(`/rooms/${room.id}`);
+        setRooms(prev => prev.filter(r => r.id !== room.id));
+        setSelectedRoomIds(prev => prev.filter(id => id !== room.id));
+        showAlert('Success', 'Room deleted successfully', 'success');
+      } catch (error) {
+        showAlert('Error', 'Failed to delete room', 'error');
+      }
+    });
   };
 
   const handleView = (room: Room) => {
     window.open(`/room/${room.id}`, '_blank');
+  };
+
+  const handlePreviewListing = async () => {
+    // Validate that we have at least a title and location
+    if (!title.trim() || !location.trim()) {
+      showAlert('Required Info', 'Please enter at least a title and location to preview the listing.', 'info');
+      return;
+    }
+
+    const finalImages = images.length > 0 ? images : [
+      'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80'
+    ];
+
+    const payload = {
+      title,
+      description: description || 'No description provided.',
+      pricePerNight: pricePerNight ? parseFloat(pricePerNight) : 0,
+      maxGuests: parseInt(maxGuests) || 2,
+      bedrooms: parseInt(bedrooms) || 1,
+      beds: parseInt(beds) || 1,
+      bathrooms: parseInt(bathrooms) || 1,
+      squareFeet: squareFeet ? parseInt(squareFeet) : undefined,
+      location,
+      address: address || 'Pending address',
+      city: city || 'Pending city',
+      country,
+      zipCode: zipCode || undefined,
+      images: finalImages,
+      tour3dUrl: tour3dUrl || undefined,
+      isFeatured,
+      isAvailable: false, // Always preview as unavailable draft initially
+      amenities: selectedAmenities,
+    };
+
+    try {
+      let roomId = '';
+      if (editingRoom) {
+        roomId = editingRoom.id;
+        await api.put(`/rooms/${roomId}`, payload);
+      } else {
+        const res = await api.post<{ id: string }>('/rooms/create', payload);
+        roomId = res.data.id;
+        // Keep editing this newly created room draft
+        const roomRes = await api.get<Room>(`/rooms/${roomId}`);
+        setEditingRoom(roomRes.data);
+        setView('edit');
+      }
+      fetchRooms();
+      window.open(`/room/${roomId}`, '_blank');
+    } catch (error) {
+      console.error(error);
+      showAlert('Error', 'Failed to generate preview listing.', 'error');
+    }
   };
 
   const addImage = () => {
@@ -200,15 +329,17 @@ export function AdminRooms() {
       bedrooms: parseInt(bedrooms),
       beds: parseInt(beds),
       bathrooms: parseInt(bathrooms),
+      squareFeet: squareFeet ? parseInt(squareFeet) : undefined,
       location,
       address,
       city,
       country,
+      zipCode: zipCode || undefined,
       images: finalImages,
       tour3dUrl: tour3dUrl || undefined,
       isFeatured,
       isAvailable,
-      amenities: [], 
+      amenities: selectedAmenities, 
     };
 
     try {
@@ -220,22 +351,25 @@ export function AdminRooms() {
       setView('list');
       resetForm();
       fetchRooms();
+      showAlert('Success', 'Room details saved successfully', 'success');
     } catch (error) {
       console.error(error);
-      alert('Failed to save room details');
+      showAlert('Error', 'Failed to save room details', 'error');
     }
   };
 
   // Bulk actions handlers
   const handleBulkDelete = async () => {
-    if (!window.confirm(`Are you sure you want to delete the ${selectedRoomIds.length} selected rooms?`)) return;
-    try {
-      await Promise.all(selectedRoomIds.map(id => api.delete(`/rooms/${id}`)));
-      setRooms(prev => prev.filter(r => !selectedRoomIds.includes(r.id)));
-      setSelectedRoomIds([]);
-    } catch (error) {
-      alert('Failed to delete some rooms');
-    }
+    showConfirm('Delete Multiple Rooms', `Are you sure you want to delete the ${selectedRoomIds.length} selected rooms?`, async () => {
+      try {
+        await Promise.all(selectedRoomIds.map(id => api.delete(`/rooms/${id}`)));
+        setRooms(prev => prev.filter(r => !selectedRoomIds.includes(r.id)));
+        setSelectedRoomIds([]);
+        showAlert('Success', 'Selected rooms deleted successfully', 'success');
+      } catch (error) {
+        showAlert('Error', 'Failed to delete some rooms', 'error');
+      }
+    });
   };
 
   const handleBulkToggleAvailable = async () => {
@@ -251,8 +385,9 @@ export function AdminRooms() {
       }));
       setSelectedRoomIds([]);
       fetchRooms();
+      showAlert('Success', 'Selected rooms availability updated', 'success');
     } catch (error) {
-      alert('Failed to update availability');
+      showAlert('Error', 'Failed to update availability', 'error');
     }
   };
 
@@ -485,6 +620,13 @@ export function AdminRooms() {
                               <Edit className="w-4 h-4" />
                             </button>
                             <button
+                              onClick={() => navigate(`/admin/rooms/${room.id}/tour`)}
+                              className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg transition-all hover:shadow-sm"
+                              title="Manage Space Tour"
+                            >
+                              <Sparkles className="w-4 h-4" />
+                            </button>
+                            <button
                               onClick={() => handleDelete(room)}
                               className="p-2 text-slate-400 hover:text-red-600 hover:bg-white rounded-lg transition-all hover:shadow-sm"
                               title="Delete Listing"
@@ -669,45 +811,55 @@ export function AdminRooms() {
                   </div>
                 </section>
 
-                {/* Section: Layout Specifications */}
-                <section className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm space-y-6">
-                  <h3 className="text-lg font-bold font-headline flex items-center gap-2 text-on-surface">
-                    <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
-                    Layout Specifications
-                  </h3>
-                  <div className="grid grid-cols-3 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Bedrooms</label>
-                      <input
-                        type="number"
-                        required
-                        value={bedrooms}
-                        onChange={(e) => setBedrooms(e.target.value)}
-                        className="w-full bg-[#f8f9fa] border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-600/20 font-medium text-on-surface focus:outline-none"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Beds</label>
-                      <input
-                        type="number"
-                        required
-                        value={beds}
-                        onChange={(e) => setBeds(e.target.value)}
-                        className="w-full bg-[#f8f9fa] border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-600/20 font-medium text-on-surface focus:outline-none"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Bathrooms</label>
-                      <input
-                        type="number"
-                        required
-                        value={bathrooms}
-                        onChange={(e) => setBathrooms(e.target.value)}
-                        className="w-full bg-[#f8f9fa] border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-600/20 font-medium text-on-surface focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                </section>
+                 {/* Section: Layout Specifications */}
+                 <section className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm space-y-6">
+                   <h3 className="text-lg font-bold font-headline flex items-center gap-2 text-on-surface">
+                     <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
+                     Layout Specifications
+                   </h3>
+                   <div className="grid grid-cols-4 gap-6">
+                     <div className="space-y-2">
+                       <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Bedrooms</label>
+                       <input
+                         type="number"
+                         required
+                         value={bedrooms}
+                         onChange={(e) => setBedrooms(e.target.value)}
+                         className="w-full bg-[#f8f9fa] border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-600/20 font-medium text-on-surface focus:outline-none"
+                       />
+                     </div>
+                     <div className="space-y-2">
+                       <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Beds</label>
+                       <input
+                         type="number"
+                         required
+                         value={beds}
+                         onChange={(e) => setBeds(e.target.value)}
+                         className="w-full bg-[#f8f9fa] border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-600/20 font-medium text-on-surface focus:outline-none"
+                       />
+                     </div>
+                     <div className="space-y-2">
+                       <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Bathrooms</label>
+                       <input
+                         type="number"
+                         required
+                         value={bathrooms}
+                         onChange={(e) => setBathrooms(e.target.value)}
+                         className="w-full bg-[#f8f9fa] border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-600/20 font-medium text-on-surface focus:outline-none"
+                       />
+                     </div>
+                     <div className="space-y-2">
+                       <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Square Feet</label>
+                       <input
+                         type="number"
+                         value={squareFeet}
+                         onChange={(e) => setSquareFeet(e.target.value)}
+                         className="w-full bg-[#f8f9fa] border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-600/20 font-medium text-on-surface focus:outline-none"
+                         placeholder="e.g. 650"
+                       />
+                     </div>
+                   </div>
+                 </section>
 
                 {/* Section: Address Details */}
                 <section className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm space-y-6">
@@ -715,8 +867,8 @@ export function AdminRooms() {
                     <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
                     Street Address Details
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-2 md:col-span-1">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="space-y-2">
                       <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Street Address</label>
                       <input
                         type="text"
@@ -749,11 +901,21 @@ export function AdminRooms() {
                         placeholder="Greece"
                       />
                     </div>
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Postal / Zip Code</label>
+                      <input
+                        type="text"
+                        value={zipCode}
+                        onChange={(e) => setZipCode(e.target.value)}
+                        className="w-full bg-[#f8f9fa] border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-600/20 font-medium text-on-surface focus:outline-none"
+                        placeholder="e.g. 84702"
+                      />
+                    </div>
                   </div>
                 </section>
 
                 {/* Section: Virtual Tour */}
-                <section className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm space-y-6">
+                {/* <section className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm space-y-6">
                   <h3 className="text-lg font-bold font-headline flex items-center gap-2 text-on-surface">
                     <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
                     Interactive Virtual Tour
@@ -772,7 +934,7 @@ export function AdminRooms() {
                     </div>
                     <p className="text-[10px] text-slate-400 mt-1 font-body">Provides prospective guests with an immersive digital twin walkthrough of the suite.</p>
                   </div>
-                </section>
+                </section> */}
 
                 {/* Section: Media Assets */}
                 <section className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm space-y-6">
@@ -847,6 +1009,87 @@ export function AdminRooms() {
                       </div>
                     )}
                   </div>
+                </section>
+
+                {/* Section: Amenities */}
+                <section className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm space-y-5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-bold font-headline flex items-center gap-2 text-on-surface">
+                      <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
+                      Amenities &amp; Features
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setShowAmenityInput(prev => !prev)}
+                      className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-3 py-2 rounded-lg transition-all"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Add Custom Amenity
+                    </button>
+                  </div>
+
+                  {/* Custom Amenity Inline Input */}
+                  {showAmenityInput && (
+                    <div className="flex items-center gap-3 p-4 bg-indigo-50/60 border border-indigo-100 rounded-xl">
+                      <input
+                        autoFocus
+                        type="text"
+                        value={newAmenityName}
+                        onChange={(e) => setNewAmenityName(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddCustomAmenity(); } if (e.key === 'Escape') { setShowAmenityInput(false); setNewAmenityName(''); } }}
+                        placeholder="e.g. Heated Pool, Starlink WiFi, Pet Friendly…"
+                        className="flex-1 bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-medium focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                      />
+                      <button
+                        type="button"
+                        disabled={!newAmenityName.trim() || isAddingAmenity}
+                        onClick={handleAddCustomAmenity}
+                        className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5"
+                      >
+                        {isAddingAmenity ? <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setShowAmenityInput(false); setNewAmenityName(''); }}
+                        className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-white transition-all"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+
+                  {availableAmenities.length === 0 ? (
+                    <p className="text-xs text-slate-400 font-medium italic">No amenities loaded — click "Add Custom Amenity" to create the first one.</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-3">
+                      {availableAmenities.map((amenity) => {
+                        const isSelected = selectedAmenities.includes(amenity.id);
+                        return (
+                          <button
+                            key={amenity.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedAmenities(prev =>
+                                prev.includes(amenity.id)
+                                  ? prev.filter(id => id !== amenity.id)
+                                  : [...prev, amenity.id]
+                              );
+                            }}
+                            className={`px-4 py-2.5 rounded-full border text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+                              isSelected
+                                ? 'border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm shadow-indigo-100'
+                                : 'border-outline-variant/50 text-on-surface-variant hover:bg-slate-50'
+                            }`}
+                          >
+                            {amenity.icon && <span>{amenity.icon}</span>}
+                            <span>{amenity.name}</span>
+                            {isSelected && <span className="text-[10px] font-black font-headline">✓</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </section>
               </div>
 
@@ -990,18 +1233,16 @@ export function AdminRooms() {
                   >
                     Cancel
                   </button>
-                  {editingRoom && (
-                    <button
-                      type="button"
-                      onClick={() => handleView(editingRoom)}
-                      className="px-6 py-2.5 text-indigo-600 hover:bg-indigo-50 rounded-lg text-sm font-bold transition-all flex items-center gap-2"
-                    >
-                      <Eye className="w-4 h-4" /> Preview Listing
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={handlePreviewListing}
+                    className="px-6 py-2.5 text-indigo-600 hover:bg-indigo-50 rounded-lg text-sm font-bold transition-all flex items-center gap-2 cursor-pointer"
+                  >
+                    <Eye className="w-4 h-4" /> Preview Listing
+                  </button>
                   <button
                     type="submit"
-                    className="px-10 py-2.5 bg-gradient-to-b from-primary to-primary-container text-white rounded-lg text-sm font-bold shadow-lg shadow-indigo-200 hover:scale-[1.02] transition-all"
+                    className="px-10 py-2.5 bg-gradient-to-b from-primary to-primary-container text-white rounded-lg text-sm font-bold shadow-lg shadow-indigo-200 hover:scale-[1.02] transition-all cursor-pointer"
                   >
                     {view === 'create' ? 'Publish Room' : 'Update Room'}
                   </button>
@@ -1011,6 +1252,64 @@ export function AdminRooms() {
           </main>
         )}
       </div>
+      
+      {/* ── CUSTOM NOTIFICATION / CONFIRMATION MODAL ── */}
+      {notification && notification.isOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6 animate-in fade-in duration-200">
+          <div className="bg-surface-container-lowest border border-outline-variant/15 p-6 rounded-2xl w-full max-w-sm shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3">
+              <div className={cn(
+                "w-9 h-9 rounded-full flex items-center justify-center border flex-shrink-0",
+                notification.type === 'success' && "bg-emerald-500/10 border-emerald-500/20 text-emerald-500",
+                notification.type === 'error' && "bg-error/10 border-error/20 text-error",
+                notification.type === 'confirm' && "bg-amber-500/10 border-amber-500/20 text-amber-500",
+                notification.type === 'info' && "bg-primary/10 border-primary/20 text-primary"
+              )}>
+                {notification.type === 'success' && <Check className="w-5 h-5" />}
+                {notification.type === 'error' && <X className="w-4 h-4" />}
+                {notification.type === 'confirm' && <HelpCircle className="w-4.5 h-4.5" />}
+                {notification.type === 'info' && <AlertCircle className="w-5 h-5" />}
+              </div>
+              <h3 className="font-headline font-bold text-sm text-on-surface uppercase tracking-wider leading-none">
+                {notification.title}
+              </h3>
+            </div>
+            
+            <p className="text-xs text-on-surface-variant font-body leading-relaxed">
+              {notification.message}
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-outline-variant/10">
+              {notification.type === 'confirm' ? (
+                <>
+                  <button
+                    onClick={() => setNotification(null)}
+                    className="px-4 py-2 bg-surface-container hover:bg-outline-variant/10 text-on-surface-variant rounded-xl text-[10px] uppercase tracking-wider transition-colors font-headline font-bold cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (notification.onConfirm) notification.onConfirm();
+                      setNotification(null);
+                    }}
+                    className="px-4 py-2 bg-on-surface hover:bg-primary text-surface hover:text-white rounded-xl text-[10px] uppercase tracking-wider transition-colors font-headline font-bold cursor-pointer"
+                  >
+                    Confirm
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setNotification(null)}
+                  className="px-5 py-2 bg-on-surface hover:bg-primary text-surface hover:text-white rounded-xl text-[10px] uppercase tracking-wider transition-colors font-headline font-bold w-full cursor-pointer"
+                >
+                  Okay
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

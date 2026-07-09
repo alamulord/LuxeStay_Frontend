@@ -228,3 +228,19 @@
     }
   }
 }
+
+/* ── Admin Sidebar Collapsible Transition Rules ── */
+.ml-\[260px\],
+aside,
+header,
+main,
+.flex-grow,
+.flex-1 {
+  transition: margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1), 
+              width 300ms cubic-bezier(0.4, 0, 0.2, 1),
+              padding-left 300ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.sidebar-collapsed .ml-\[260px\] {
+  margin-left: 70px !important;
+}

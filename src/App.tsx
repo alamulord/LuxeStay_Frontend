@@ -43,6 +43,7 @@ const UserPayments = lazy(() => import('./pages/Dashboard/Payments').then(m => (
 
 const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard').then(m => ({ default: m.AdminDashboard })));
 const AdminRooms = lazy(() => import('./pages/Admin/Rooms').then(m => ({ default: m.AdminRooms })));
+const AdminTourBuilder = lazy(() => import('./pages/Admin/TourBuilder').then(m => ({ default: m.AdminTourBuilder })));
 const AdminBookings = lazy(() => import('./pages/Admin/Bookings').then(m => ({ default: m.AdminBookings })));
 const AdminPayments = lazy(() => import('./pages/Admin/Payments').then(m => ({ default: m.AdminPayments })));
 const AdminUsers = lazy(() => import('./pages/Admin/Users').then(m => ({ default: m.AdminUsers })));
@@ -50,6 +51,7 @@ const AdminCMS = lazy(() => import('./pages/Admin/CMS').then(m => ({ default: m.
 const AdminAnalytics = lazy(() => import('./pages/Admin/Analytics').then(m => ({ default: m.AdminAnalytics })));
 const AdminSettings = lazy(() => import('./pages/Admin/Settings').then(m => ({ default: m.AdminSettings })));
 const AdminProfile = lazy(() => import('./pages/Admin/Profile').then(m => ({ default: m.AdminProfile })));
+const AdminActivities = lazy(() => import('./pages/Admin/Activities').then(m => ({ default: m.AdminActivities })));
 
 const BookingDetails = lazy(() => import('./pages/BookingDetails').then(m => ({ default: m.BookingDetails })));
 const ReviewForm = lazy(() => import('./pages/ReviewForm').then(m => ({ default: m.ReviewForm })));
@@ -136,6 +138,11 @@ function App() {
                     <AdminRooms />
                   </ProtectedRoute>
                 } />
+                <Route path="/admin/rooms/:id/tour" element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminTourBuilder />
+                  </ProtectedRoute>
+                } />
                 <Route path="/admin/bookings" element={
                   <ProtectedRoute requireAdmin>
                     <AdminBookings />
@@ -169,6 +176,11 @@ function App() {
                 <Route path="/admin/profile" element={
                   <ProtectedRoute requireAdmin>
                     <AdminProfile />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/activities" element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminActivities />
                   </ProtectedRoute>
                 } />
 

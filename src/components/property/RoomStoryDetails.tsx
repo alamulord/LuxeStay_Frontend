@@ -256,6 +256,7 @@ export const RoomStoryDetails: React.FC<RoomStoryDetailsProps> = ({
           is3dActive={is3dActive}
           setIs3dActive={setIs3dActive}
           tour3dUrl={room.tour3dUrl}
+          roomId={room.id}
         />
       </section>
       {/* ── 8. GUEST IMPRESSIONS ── */}
