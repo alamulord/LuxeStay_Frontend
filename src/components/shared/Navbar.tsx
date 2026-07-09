@@ -229,6 +229,13 @@ export function Navbar() {
               )}
               <div className="border-t border-outline-variant/10 pt-4 mt-2">
                 <Link
+                  to="/search"
+                  className="block px-4 py-3 text-sm hover:bg-surface-container-low rounded-lg"
+                  onClick={closeMobileMenu}
+                >
+                  Search
+                </Link>
+                <Link
                   to="/immersive-experiences"
                   className="block px-4 py-3 text-sm hover:bg-surface-container-low rounded-lg"
                   onClick={closeMobileMenu}
