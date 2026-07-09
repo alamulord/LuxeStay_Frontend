@@ -178,6 +178,7 @@ export function AdminDashboard() {
           // Add notification of completed action
           const newAct = {
             id: `ai_${Date.now()}`,
+            action: 'AI_OPTIMIZATION',
             type: 'system',
             description: `AI Engine: Automatically resolved optimization suggestion — "${aiSuggestion}"`,
             createdAt: new Date().toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })
