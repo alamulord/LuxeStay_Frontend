@@ -115,9 +115,10 @@ export function AdminRooms() {
       if (response.data?.url) {
         setImages(prev => [...prev, response.data.url]);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Image upload failed', err);
-      showAlert('Error', 'Failed to upload image. Please check API connection and try again.', 'error');
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to upload image. Please check file size and connection.';
+      showAlert('Upload Failed', errorMessage, 'error');
     } finally {
       setIsUploadingImage(false);
     }

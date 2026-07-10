@@ -257,7 +257,7 @@ export function Press() {
                   onClick={() => handleSelectArticle(articles.indexOf(filteredArticles[0]))}
                   className="md:col-span-12 lg:col-span-8 group cursor-pointer border border-outline-variant/10 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 bg-white flex flex-col justify-between"
                 >
-                  <div className="aspect-[16/9] w-full overflow-hidden relative">
+                  <div className="aspect-[16/9] h-full w-full overflow-hidden relative">
                     <OptimizedImage
                       src={filteredArticles[0].image}
                       alt={filteredArticles[0].title}

@@ -13,12 +13,7 @@ export function SignatureSeries() {
         {/* Editorial Hero */}
         <section className='relative py-24 px-6 lg:px-16 overflow-hidden bg-surface-container-low border-b border-outline-variant/15'>
           <div className='max-w-4xl mx-auto text-center space-y-6 relative z-10'>
-            <Link
-              to='/'
-              className='inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary hover:underline mb-4'
-            >
-              <ArrowLeft className='w-3.5 h-3.5' /> Back to Home
-            </Link>
+            
             <div className='inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 text-primary text-xs font-bold uppercase tracking-widest border border-primary/10'>
               <Sparkles className='w-3 h-3' /> Signature Showcase
             </div>
