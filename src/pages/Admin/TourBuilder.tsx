@@ -174,11 +174,13 @@ export function AdminTourBuilder() {
         setGenerationType(null);
       }, 1000);
 
-    } catch (error) {
+    } catch (error: any) {
       clearInterval(progressInterval);
       setIsGenerating(false);
       setGenerationType(null);
-      showAlert('Error', 'Failed to generate tour. Verify that room has images.', 'error');
+      setGenerationProgress(0);
+      const msg = error?.response?.data?.message || error?.message || 'Failed to generate tour. Verify that room has images.';
+      showAlert('Error', msg, 'error');
     }
   };
 
@@ -195,22 +197,24 @@ export function AdminTourBuilder() {
       
       setTimeout(() => {
         setTour(res.data);
-        // Preserve active scene
+        // Directly update activeScene from fresh response — no null flash
         if (activeScene) {
-          const stillExists = res.data.scenes.find(s => s.id === activeScene.id);
-          if (stillExists) {
-            setActiveScene(stillExists);
+          const updatedScene = res.data.scenes.find((s: { id: string }) => s.id === activeScene.id);
+          if (updatedScene) {
+            setActiveScene({ ...updatedScene });
           }
         }
         setIsSuggesting(false);
         setGenerationType(null);
       }, 1000);
 
-    } catch (error) {
+    } catch (error: any) {
       clearInterval(progressInterval);
       setIsSuggesting(false);
       setGenerationType(null);
-      showAlert('Error', 'Failed to suggest hotspots.', 'error');
+      setGenerationProgress(0);
+      const msg = error?.response?.data?.message || error?.message || 'Failed to suggest hotspots.';
+      showAlert('Error', msg, 'error');
     }
   };
 

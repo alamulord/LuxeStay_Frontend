@@ -20,12 +20,6 @@ export function Careers() {
         {/* Careers Hero */}
         <section className='relative px-6 lg:px-16 pt-20 pb-32 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center'>
           <div className='lg:col-span-7 space-y-8'>
-            <Link
-              to='/'
-              className='inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary hover:underline mb-4'
-            >
-              <ArrowLeft className='w-3.5 h-3.5' /> Back to Home
-            </Link>
             <span className='inline-block px-4 py-1.5 rounded-full bg-primary/5 text-primary text-xs font-bold tracking-widest uppercase border border-primary/10'>
               Join the Collective
             </span>
